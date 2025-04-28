@@ -1,32 +1,54 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { productsApi } from '../api/productsApi';
-import { Product } from '../types';
+import { 
+  fetchProducts, 
+  fetchProductsByCategory, 
+  fetchProductById,
+  fetchBestSellers,
+  fetchSaleProducts,
+  fetchNewArrivals
+} from '../api/productsApi';
+import { ProductCategory } from '../types';
 
-export const useProducts = () => {
-  return useQuery<Product[]>({
+export const useAllProducts = () => {
+  return useQuery({
     queryKey: ['products'],
-    queryFn: productsApi.getAll
+    queryFn: fetchProducts
   });
 };
 
-export const useProduct = (id: number) => {
-  return useQuery<Product>({
+export const useProductsByCategory = (category: ProductCategory) => {
+  return useQuery({
+    queryKey: ['products', 'category', category],
+    queryFn: () => fetchProductsByCategory(category)
+  });
+};
+
+export const useProductById = (id: string | undefined) => {
+  return useQuery({
     queryKey: ['product', id],
-    queryFn: () => productsApi.getById(id)
+    queryFn: () => fetchProductById(id || ''),
+    enabled: !!id
   });
 };
 
-export const useCategories = () => {
-  return useQuery<string[]>({
-    queryKey: ['categories'],
-    queryFn: productsApi.getCategories
+export const useBestSellers = () => {
+  return useQuery({
+    queryKey: ['products', 'bestsellers'],
+    queryFn: fetchBestSellers
   });
 };
 
-export const useProductsByCategory = (category: string) => {
-  return useQuery<Product[]>({
-    queryKey: ['products', category],
-    queryFn: () => productsApi.getByCategory(category)
+export const useSaleProducts = () => {
+  return useQuery({
+    queryKey: ['products', 'sale'],
+    queryFn: fetchSaleProducts
+  });
+};
+
+export const useNewArrivals = () => {
+  return useQuery({
+    queryKey: ['products', 'new-arrivals'],
+    queryFn: fetchNewArrivals
   });
 }; 

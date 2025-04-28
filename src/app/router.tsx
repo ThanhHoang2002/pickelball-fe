@@ -1,33 +1,42 @@
-import { lazy } from 'react';
-import {createBrowserRouter, RouterProvider} from 'react-router';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import NotFoundPage from '@/components/errors/NotFoundPage';
-import {MainLayout} from '@/components/layout/main-layout/MainLayout';
-import {paths} from '@/config/paths';
-const Products = lazy(() => import('@/app/pages/product/Products'));
-const ProductDetail = lazy(() => import('@/app/pages/product/ProductDetail'));
-const Cart = lazy(() => import('@/app/pages/cart/Cart'));
-export const AppRouter = () => {
-    const router = createBrowserRouter([
-        {
-            element: <MainLayout />,
-            children: [
-                {
-                    path: paths.home,
-                    element: <Products />,
-                },
-                {
-                    path: '/products/:id',
-                    element: <ProductDetail />,
-                },
-                {
-                    path: '/cart',
-                    element: <Cart />,
-                },                     
-            ],
-            errorElement: <NotFoundPage/>,
-        },
-    
-    ])
-    return <RouterProvider router={router}/>
-}
+import { CartPage } from '@/app/pages/cart/CartPage';
+import { HomePage } from '@/app/pages/HomePage';
+import { CategoryPage } from '@/app/pages/product/CategoryPage';
+import { ProductDetailsPage } from '@/app/pages/product/ProductDetailsPage';
+import ErrorBoundary from '@/components/errors/ErrorBoundary';
+import { MainLayout } from '@/components/layout/main-layout/MainLayout';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <MainLayout />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />,
+      },
+      {
+        path: 'products/:slug',
+        element: <ProductDetailsPage />,
+      },
+      {
+        path: 'category/:category',
+        element: <CategoryPage />,
+      },
+      {
+        path: 'cart',
+        element: <CartPage />,
+      },
+      {
+        path: 'sale',
+        element: <CategoryPage />,
+      },
+    ],
+  },
+]);
+
+export const Router = () => {
+  return <RouterProvider router={router} />;
+};
