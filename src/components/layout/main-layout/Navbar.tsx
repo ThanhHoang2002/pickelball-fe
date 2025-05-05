@@ -14,15 +14,6 @@ const navLinks = [
     ]
   },
   { 
-    name: 'Paddle Sets',
-    path: '/category/paddle-sets',
-    submenu: [
-      { name: 'Best Selling Sets', path: '/category/paddle-sets?filter=bestseller' },
-      { name: 'Build Your Own Set', path: '/custom-set' },
-      { name: 'Shop All', path: '/category/paddle-sets' },
-    ]
-  },
-  { 
     name: 'Clothing',
     path: '/category/clothing',
     submenu: [
@@ -46,19 +37,7 @@ const navLinks = [
       { name: 'Paddle Covers', path: '/category/accessories?type=paddle-covers' },
       { name: 'Shop All', path: '/category/accessories' },
     ]
-  },
-  { 
-    name: 'Custom Paddles',
-    path: '/category/custom-paddles',
-    submenu: [
-      { name: 'Design Your Own', path: '/custom-paddle' },
-      { name: 'Custom for Business', path: '/custom-business' },
-    ]
-  },
-  { 
-    name: 'Sale',
-    path: '/sale',
-  },
+  }
 ];
 
 export const Navbar = () => {
@@ -117,12 +96,12 @@ export const Navbar = () => {
           {/* Logo */}
           <div className="flex flex-1 justify-center md:justify-start">
             <Link to="/" className="flex items-center" onClick={closeMenus}>
-              <span className="text-2xl font-bold">Recess Pickleball</span>
+              <span className="text-2xl font-bold">Hoang Tu Sport</span>
             </Link>
           </div>
           
           {/* Desktop menu */}
-          <div className="hidden md:flex md:items-center md:space-x-8">
+          <div className="hidden md:mr-16 md:flex md:items-center md:space-x-8">
             {navLinks.map((link) => (
               <div key={link.name} className="group relative">
                 <Link 
