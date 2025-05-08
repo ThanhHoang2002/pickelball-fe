@@ -2,6 +2,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ReactNode } from 'react';
 
+import { Toaster } from '@/components/ui/toaster';
+
 type AppProviderProps = {
   children: ReactNode;
 };
@@ -19,8 +21,9 @@ const queryClient = new QueryClient({
 export const AppProvider = ({ children }: AppProviderProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
       <ReactQueryDevtools initialIsOpen={false} />
+      {children}
+      <Toaster />
     </QueryClientProvider>
   );
 };

@@ -1,12 +1,15 @@
+import { lazy } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
-import { CartPage } from '@/app/pages/cart/CartPage';
-import { HomePage } from '@/app/pages/HomePage';
-import { CategoryPage } from '@/app/pages/product/CategoryPage';
-import { ProductDetailsPage } from '@/app/pages/product/ProductDetailsPage';
+import { CategoryPage } from '@/app/pages/client/CategoryPage';
+import { ProductDetailsPage } from '@/app/pages/client/ProductDetailsPage';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
 import { MainLayout } from '@/components/layout/main-layout/MainLayout';
-
+import AuthGuard from '@/features/auth/components/AuthGuard';
+const ContactPage = lazy(() => import('@/app/pages/client/ContactPage'));
+const HomePage = lazy(() => import('@/app/pages/client/HomePage'));
+const AboutPage = lazy(() => import('@/app/pages/client/AboutPage'));
+const CartPage = lazy(() => import('@/app/pages/client/CartPage'));
 const router = createBrowserRouter([
   {
     path: '/',
@@ -18,7 +21,7 @@ const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: 'products/:slug',
+        path: 'products/:id',
         element: <ProductDetailsPage />,
       },
       {
@@ -26,13 +29,22 @@ const router = createBrowserRouter([
         element: <CategoryPage />,
       },
       {
-        path: 'cart',
-        element: <CartPage />,
+        path: 'contact',
+        element: <ContactPage />,
       },
       {
-        path: 'sale',
-        element: <CategoryPage />,
+        path: 'about',
+        element: <AboutPage />,
       },
+      {
+        element: <AuthGuard />,
+        children: [
+          {
+            path: 'cart',
+            element: <CartPage />,
+          },
+        ],
+      }
     ],
   },
 ]);

@@ -1,34 +1,46 @@
-export type ProductCategory = 
-  | 'paddles' 
-  | 'paddle-sets' 
-  | 'clothing' 
-  | 'accessories' 
-  | 'custom-paddles';
+export interface Product {
+  id: number
+  name: string
+  description: string
+  sellPrice: number
+  quantity: number
+  image: string
+  status: string
+  createdAt: string
+  updatedAt: string | null
+  createdBy: string
+  updatedBy: string | null
+  supplier: Supplier
+  category: Category
+  
+  // Trường tương thích ngược cho component cũ
+  slug?: string
+  price?: number
+  originalPrice?: number
+  images?: string[]
+  isOnSale?: boolean
+  isBestSeller?: boolean
+  isNewArrival?: boolean
+}
 
-export type Skill = 'beginner' | 'intermediate' | 'advanced';
+export interface Supplier {
+  id: number
+  name: string
+  description: string
+  image: string | null
+  createdAt: string
+  updatedAt: string | null
+  createdBy: string
+  updatedBy: string | null
+}
 
-export type ProductColor = {
-  name: string;
-  value: string;
-  imageUrl: string;
-};
-
-export type ProductSize = 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl';
-
-export type Product = {
-  id: string;
-  name: string;
-  slug: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  category: ProductCategory;
-  tags: string[];
-  images: string[];
-  colors?: ProductColor[];
-  sizes?: ProductSize[];
-  skill?: Skill;
-  isOnSale: boolean;
-  isBestSeller?: boolean;
-  isNewArrival?: boolean;
-}; 
+export interface Category {
+  id: number
+  name: string
+  image: string | null
+  description: string
+  createdAt: string
+  updatedAt: string | null
+  createdBy: string
+  updatedBy: string | null
+}

@@ -1,15 +1,17 @@
 import { Product } from '../types';
-import { ProductCard } from './ProductCard';
+import { LegacyProductCard } from './ProductCard';
 
 type ProductGridProps = {
   products: Product[];
   title?: string;
   emptyMessage?: string;
+  cols?: number;
 };
 
 export const ProductGrid = ({ 
   products, 
   title, 
+  cols = 4,
   emptyMessage = 'No products found.' 
 }: ProductGridProps) => {
   return (
@@ -21,9 +23,9 @@ export const ProductGrid = ({
       {products.length === 0 ? (
         <p className="text-center text-gray-500">{emptyMessage}</p>
       ) : (
-        <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className={`grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 md:grid-cols-3 ${'lg:grid-cols-'+cols}`}>
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <LegacyProductCard key={product.id} product={product} />
           ))}
         </div>
       )}

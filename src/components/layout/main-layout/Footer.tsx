@@ -32,37 +32,11 @@ const socialLinks = [
 ];
 
 const Footer = () => {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would handle email signup
-    console.log('Email signup submitted');
-  };
+
 
   return (
     <footer className="bg-white">
       <div className="mx-auto max-w-7xl px-4 pt-16 sm:px-6 lg:px-8">
-        {/* Newsletter signup */}
-        <div className="border-b border-gray-200 pb-12">
-          <h3 className="text-lg font-semibold text-gray-900">Stay up to date</h3>
-          <p className="mt-1 text-sm text-gray-600">
-            Sign up for exclusive access to new products, discounts, events, and more!
-          </p>
-          <form onSubmit={handleSubmit} className="mt-4 flex max-w-md">
-            <input
-              type="email"
-              required
-              placeholder="Enter your email"
-              className="w-full rounded-l-md border border-gray-300 px-4 py-2 placeholder:text-gray-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            />
-            <button
-              type="submit"
-              className="rounded-r-md bg-black px-4 py-2 text-white hover:bg-gray-800"
-            >
-              Submit
-            </button>
-          </form>
-        </div>
-
         {/* Footer links */}
         <div className="grid grid-cols-1 gap-8 py-12 sm:grid-cols-2 md:grid-cols-4">
           {/* Shop links */}
