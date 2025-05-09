@@ -5,9 +5,11 @@ import { addToCart, clearCart as clearCartApi, getCart, removeCartItem, updateCa
 import { CartItemResponse, CartItemUI, CartSummaryUI } from '../types';
 
 import { useToast } from '@/hooks/use-toast';
+import useAuthStore from '@/stores/authStore';
 
 export const useCart = () => {
   const { toast } = useToast();
+  const {currentUser} = useAuthStore();
   const queryClient = useQueryClient();
 
   // Transform API response to UI format
@@ -31,6 +33,7 @@ export const useCart = () => {
   } = useQuery({
     queryKey: ['cart'],
     queryFn: getCart,
+    enabled: !!currentUser,
     staleTime: 1000 * 60, // 1 minute
     gcTime: 1000 * 60 * 10, // 10 minutes
     retry: 1

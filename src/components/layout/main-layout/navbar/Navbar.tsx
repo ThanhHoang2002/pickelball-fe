@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import UserInfo from './UserInfo';
 
 import { useCart } from '@/features/cart/hooks/useCart';
+import useAuthStore from '@/stores/authStore';
 
 const navLinks = [
   { name: 'Paddles', path: '/category/paddles' },
@@ -14,7 +15,14 @@ const navLinks = [
 
 export const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { itemCount } = useCart();
+  const { currentUser } = useAuthStore();
+  const location = useLocation();
+  
+  // Always call useCart regardless of auth state to maintain hooks order
+  const { itemCount = 0 } = useCart();
+  
+  // Only show cart count if user is authenticated
+  const displayItemCount = currentUser ? itemCount : 0;
   
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
@@ -71,15 +79,24 @@ export const Navbar = () => {
           {/* Desktop menu */}
           <div className="hidden md:flex md:flex-1 md:items-center md:justify-center">
             <div className="flex space-x-8">
-              {navLinks.map((link) => (
-                <Link 
-                  key={link.name}
-                  to={link.path} 
-                  className="relative text-base font-medium text-gray-700 transition-colors after:absolute after:bottom-[-3px] after:left-0 after:h-[2px] after:w-0 after:bg-black after:transition-all after:duration-300 hover:text-black hover:after:w-full"
-                >
-                  {link.name}
-                </Link>
-              ))}
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path || 
+                                (link.path !== '/' && location.pathname.startsWith(link.path));
+                
+                return (
+                  <Link 
+                    key={link.name}
+                    to={link.path} 
+                    className={`relative text-base font-medium transition-colors after:absolute after:bottom-[-3px] after:left-0 after:h-[2px] after:bg-black after:transition-all after:duration-300 ${
+                      isActive 
+                        ? 'text-black after:w-full' 
+                        : 'text-gray-700 after:w-0 hover:text-black hover:after:w-full'
+                    }`}
+                  >
+                    {link.name}
+                  </Link>
+                );
+              })}
             </div>
           </div>
           
@@ -129,9 +146,9 @@ export const Navbar = () => {
                 />
               </svg>
               
-              {itemCount > 0 && (
+              {displayItemCount > 0 && (
                 <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                  {itemCount}
+                  {displayItemCount}
                 </span>
               )}
             </Link>
@@ -145,16 +162,25 @@ export const Navbar = () => {
       {mobileMenuOpen && (
         <div className="md:hidden" id="mobile-menu">
           <div className="space-y-1 px-4 pb-5 pt-2">
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={closeMenu}
-                className="block border-l-4 border-transparent py-3 pl-3 text-base font-medium text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:text-black"
-              >
-                {link.name}
-              </Link>
-            ))}
+            {navLinks.map((link) => {
+              const isActive = location.pathname === link.path || 
+                              (link.path !== '/' && location.pathname.startsWith(link.path));
+              
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={closeMenu}
+                  className={`block border-l-4 py-3 pl-3 text-base font-medium ${
+                    isActive 
+                      ? 'border-black bg-gray-50 text-black' 
+                      : 'border-transparent text-gray-700 hover:border-gray-300 hover:bg-gray-50 hover:text-black'
+                  }`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

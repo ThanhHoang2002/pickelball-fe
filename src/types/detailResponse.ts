@@ -7,5 +7,5 @@ export interface Meta {
 
 export interface DetailResponse<T> {
   meta: Meta
-  result: T[]
+  result: T
 }

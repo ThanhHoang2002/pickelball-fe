@@ -10,45 +10,28 @@ import { formatProductsFromApi } from '../utils/productFormatters';
 export const useAllProducts = (params: ProductsParams = {}) => {
   return useQuery({
     queryKey: ['products', params],
-    queryFn: async () => {
-      const response = await getAllProduct(params);
-      return response.data.result;
-    }
+    queryFn:  async () => await getAllProduct(params)
+  
   });
 };
 
 /**
  * Hook để lấy sản phẩm theo danh mục
  */
-export const useProductsByCategory = (categoryId: number, params: ProductsParams = {}) => {
+export const useProductsByCategory = (categoryName: string, params: ProductsParams = {}) => {
   return useQuery({
-    queryKey: ['products', 'category', categoryId, params],
-    queryFn: async () => {
-      const response = await getAllProduct({ ...params, categoryId });
-      return response.data.result;
-    }
+    queryKey: ['products', 'category', categoryName, params],
+    queryFn:  async () => await getAllProduct({ ...params, categoryName })
   });
 };
 
 /**
  * Hook để lấy sản phẩm theo ID
  */
-export const useProductById = (id: string | number | undefined) => {
+export const useProductById = (id: number) => {
   return useQuery({
     queryKey: ['product', id],
-    queryFn: async () => {
-      if (typeof id === 'undefined') {
-        return null;
-      }
-      
-      try {
-        const response = await getProductById(id);
-        return response.data;
-      } catch (error) {
-        console.error('Error fetching product:', error);
-        return null;
-      }
-    },
+    queryFn:  async () => await getProductById(id),
     enabled: !!id
   });
 };
@@ -67,7 +50,7 @@ export const useBestSellers = (params: ProductsParams = {}) => {
       });
       
       // Format và trả về sản phẩm (đảm bảo có các trường tương thích ngược)
-      return formatProductsFromApi(response.data.result);
+      return formatProductsFromApi(response.result);
     }
   });
 };
@@ -83,7 +66,7 @@ export const useSaleProducts = (params: ProductsParams = {}) => {
         ...params,
       });
       
-      const products = response.data.result;
+      const products = response.result;
       const formattedProducts = formatProductsFromApi(products);
       
       // Lọc sản phẩm đang khuyến mãi (đã có trường isOnSale từ formatProductsFromApi)
@@ -104,7 +87,7 @@ export const useNewArrivals = (params: ProductsParams = {}) => {
         // Sắp xếp theo createdAt giảm dần có thể được thêm vào API trong tương lai
       });
       
-      const products = response.data.result;
+      const products = response.result;
       return formatProductsFromApi(products.slice(0, 5));
     }
   });

@@ -158,13 +158,13 @@ const Price = ({ className, showCurrency = true }: PriceProps) => {
     <div className={cn("mt-1 flex items-center", className)}>
       <span className={`text-lg font-semibold ${formattedProduct.originalPrice ? 'text-red-600' : 'text-gray-900'}`}>
         {formattedProduct.price.toLocaleString()}
-        {showCurrency && 'đ'}
+        {showCurrency && '$'}
       </span>
       
       {formattedProduct.originalPrice && (
         <span className="ml-2 text-sm text-gray-500 line-through">
           {formattedProduct.originalPrice.toLocaleString()}
-          {showCurrency && 'đ'}
+          {showCurrency && '$'}
         </span>
       )}
     </div>
