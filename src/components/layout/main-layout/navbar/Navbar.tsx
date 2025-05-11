@@ -3,9 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 
 import UserInfo from './UserInfo';
 
+import useAuthStore from '@/features/auth/stores/authStore';
 import { useCart } from '@/features/cart/hooks/useCart';
-import useAuthStore from '@/stores/authStore';
-
 const navLinks = [
   { name: 'Paddles', path: '/category/paddles' },
   { name: 'Accessories', path: '/category/accessories' },
@@ -101,30 +100,7 @@ export const Navbar = () => {
           </div>
           
           {/* Search, account, cart */}
-          <div className="flex items-center justify-end space-x-4">
-            <button
-              type="button"
-              className="p-2 text-gray-700 transition-colors hover:text-black"
-              aria-label="Search"
-            >
-              <span className="sr-only">Search</span>
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
-                />
-              </svg>
-            </button>
-            
-            
+          <div className="flex items-center justify-end space-x-4">                   
             <Link 
               to="/cart" 
               className="relative p-2 text-gray-700 transition-colors hover:text-black"

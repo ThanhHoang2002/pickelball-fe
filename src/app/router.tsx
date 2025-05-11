@@ -1,15 +1,26 @@
-import { lazy } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+
+import CheckoutPage from './pages/client/CheckoutPage';
 
 import { CategoryPage } from '@/app/pages/client/CategoryPage';
 import { ProductDetailsPage } from '@/app/pages/client/ProductDetailsPage';
 import ErrorBoundary from '@/components/errors/ErrorBoundary';
+import DashboardLayout from '@/components/layout/dashboard-layout';
 import { MainLayout } from '@/components/layout/main-layout/MainLayout';
+import GlobalLoading from '@/components/loading/GlobalLoading';
+import AdminGuard from '@/features/auth/components/AdminGuard';
 import AuthGuard from '@/features/auth/components/AuthGuard';
 const ContactPage = lazy(() => import('@/app/pages/client/ContactPage'));
 const HomePage = lazy(() => import('@/app/pages/client/HomePage'));
 const AboutPage = lazy(() => import('@/app/pages/client/AboutPage'));
 const CartPage = lazy(() => import('@/app/pages/client/CartPage'));
+const DashboardPage = lazy(() => import('@/app/pages/admin/DashboardPage'));
+const ProductPage = lazy(() => import('@/app/pages/admin/ProductPage'));
+const OrderPage = lazy(() => import('@/app/pages/admin/OrderPage'));
+const CustomerPage = lazy(() => import('@/app/pages/admin/CustomerPage'));
+const Supplier = lazy(() => import('@/app/pages/admin/Supplier'));
+
 const router = createBrowserRouter([
   {
     path: '/',
@@ -43,7 +54,41 @@ const router = createBrowserRouter([
             path: 'cart',
             element: <CartPage />,
           },
+          {
+            path: 'checkout/*',
+            element: <CheckoutPage />,
+          },
         ],
+      }
+    ],
+  },
+  {
+    path: 'admin',
+       element: <Suspense fallback={<GlobalLoading/>} ><AdminGuard><DashboardLayout /></AdminGuard></Suspense>,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/admin/dashboard" />
+      },
+      {
+        path: 'dashboard',
+        element: <DashboardPage />,
+      },
+      {
+        path: 'products',
+        element: <ProductPage />,
+      },
+      {
+        path: 'orders',
+        element: <OrderPage />,
+      },
+      {
+        path: 'customers',
+        element: <CustomerPage />,
+      },
+      {
+        path: 'suppliers',
+        element: <Supplier />,
       }
     ],
   },

@@ -4,8 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { addToCart, clearCart as clearCartApi, getCart, removeCartItem, updateCartItem } from '../api/cartApi';
 import { CartItemResponse, CartItemUI, CartSummaryUI } from '../types';
 
+import useAuthStore from '@/features/auth/stores/authStore';
 import { useToast } from '@/hooks/use-toast';
-import useAuthStore from '@/stores/authStore';
 
 export const useCart = () => {
   const { toast } = useToast();
@@ -138,7 +138,7 @@ export const useCart = () => {
   // Calculate cart summary
   const calculateSummary = (): CartSummaryUI => {
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const shipping = subtotal > 150000 ? 0 : 30000; // Free shipping above 150k
+    const shipping = subtotal > 150 ? 0 : 1; // Free shipping above 150k
     const total = subtotal + shipping;
     const itemCount = items.reduce((count, item) => count + item.quantity, 0);
 

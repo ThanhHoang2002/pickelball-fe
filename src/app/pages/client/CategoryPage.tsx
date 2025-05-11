@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { Loader2, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
@@ -11,6 +11,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useCart } from '@/features/cart';
 import { ProductGrid } from '@/features/products/components/ProductGrid';
 import { useProductsParams } from '@/features/products/hooks/useProductParams';
 import { useProductsByCategory } from '@/features/products/hooks/useProducts';
@@ -29,30 +30,63 @@ export const CategoryPage = () => {
   const { category } = useParams<{ category: string }>();
   const { filters, updateFilters } = useProductsParams();
   const { data: suppliersData } = useSuppliers();
-  
+  const {addItem} = useCart()
   // Lấy các tham số lọc từ URL
   const minPrice = filters.minPrice;
   const maxPrice = filters.maxPrice;
   const sortBy = filters.sortBy;
   const sortDirection = filters.sortDirection;
+  const searchTerm = filters.search;
   
   // State để lưu trữ giá trị đang nhập trước khi debounce
   const [minPriceInput, setMinPriceInput] = useState<number | undefined>(minPrice);
   const [maxPriceInput, setMaxPriceInput] = useState<number | undefined>(maxPrice);
+  const [searchInput, setSearchInput] = useState<string>(searchTerm || '');
   
-  // Sử dụng debounce cho giá trị giá
+  // Sử dụng debounce cho giá trị giá và search
   const debouncedMinPrice = useDebounce<number | undefined>(minPriceInput, { delay: 500 });
   const debouncedMaxPrice = useDebounce<number | undefined>(maxPriceInput, { delay: 500 });
+  const debouncedSearchTerm = useDebounce<string>(searchInput, { delay: 500 });
+  
+  // Lưu trữ category hiện tại để theo dõi thay đổi
+  const [previousCategory, setPreviousCategory] = useState<string | undefined>(category);
   
   // Cập nhật category filter từ URL parameter
   useEffect(() => {
     if (category) {
-      updateFilters({
-        categoryName: mappingCategoryName(category),
-        size: 18 // Hiển thị 18 sản phẩm mỗi trang
-      });
+      // Nếu category thay đổi, reset search và các bộ lọc khác
+      if (category !== previousCategory) {
+        // Reset search
+        setSearchInput('');
+        
+        // Reset price inputs
+        setMinPriceInput(undefined);
+        setMaxPriceInput(undefined);
+        
+        // Cập nhật filters với category mới và reset các bộ lọc
+        updateFilters({
+          categoryName: mappingCategoryName(category),
+          size: 18,
+          page: 1,
+          search: undefined,
+          minPrice: undefined,
+          maxPrice: undefined,
+          supplierId: undefined,
+          sortBy: undefined,
+          sortDirection: undefined
+        });
+        
+        // Cập nhật previous category
+        setPreviousCategory(category);
+      } else {
+        // Nếu không thay đổi category, chỉ cập nhật categoryName
+        updateFilters({
+          categoryName: mappingCategoryName(category),
+          size: 18
+        });
+      }
     }
-  }, [category, updateFilters]);
+  }, [category, previousCategory, updateFilters]);
   
   // Fetch sản phẩm theo danh mục
   const { data: productData, isLoading, isFetching } = useProductsByCategory(
@@ -84,6 +118,19 @@ export const CategoryPage = () => {
       updateFilters({ maxPrice: debouncedMaxPrice, page: 1 });
     }
   }, [debouncedMaxPrice, maxPrice, updateFilters]);
+  
+  // Cập nhật URL khi search term thay đổi
+  useEffect(() => {
+    if (debouncedSearchTerm !== searchTerm) {
+      updateFilters({ search: debouncedSearchTerm, page: 1 });
+    }
+  }, [debouncedSearchTerm, searchTerm, updateFilters]);
+  
+  // Xử lý xóa search
+  const handleClearSearch = () => {
+    setSearchInput('');
+    updateFilters({ search: undefined, page: 1 });
+  };
   
   // Xử lý chuyển trang
   const handlePageChange = (page: number) => {
@@ -236,6 +283,30 @@ export const CategoryPage = () => {
         </p>
       </div>
       
+      {/* Search bar - Hiển thị ở trên cùng */}
+      <div className="mb-8">
+        <div className="relative">
+          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <Search className="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            className="w-full rounded-md border border-gray-300 py-3 pl-10 pr-12 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            placeholder="Search products..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          {searchInput && (
+            <button
+              className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
+              onClick={handleClearSearch}
+            >
+              <span className="text-xl">&times;</span>
+            </button>
+          )}
+        </div>
+      </div>
+      
       <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
         {/* Filters - sidebar */}
         <div className="hidden md:block">
@@ -341,11 +412,27 @@ export const CategoryPage = () => {
         </div>
         
         {/* Product grid and pagination */}
-        <div className="md:col-span-3">        
+        <div className="md:col-span-3">
+          {/* Thông báo search results */}
+          {searchTerm && !isLoading && (
+            <div className="mb-6 flex justify-between">
+              <p className="text-sm text-gray-600">
+                Search results for <span className="font-medium">&ldquo;{searchTerm}&rdquo;</span>
+              </p>
+              <button
+                className="text-sm text-blue-600 hover:text-blue-800"
+                onClick={handleClearSearch}
+              >
+                Clear search
+              </button>
+            </div>
+          )}
+          
           <ProductGrid 
             products={productData?.result || []}
             cols={3}
             emptyMessage={isLoading ? 'Loading products...' : 'No products found matching your criteria.'}
+            addItem={addItem}
           />
           
           {/* Hiển thị loading spinner khi đang fetch */}

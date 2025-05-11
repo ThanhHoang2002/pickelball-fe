@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import Image from "@/components/ui/image";
 import { useAuthFormStore } from "@/features/auth/stores/authFormStore";
 import useAuthStore from "@/features/auth/stores/authStore";
 
@@ -44,7 +45,11 @@ const UserInfo = () => {
       <DropdownMenuTrigger asChild>
         <button className="hidden cursor-pointer items-center gap-1 rounded-full p-1 outline-none hover:bg-gray-100 lg:flex">
           <div className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-gray-200">
-            <User className="h-5 w-5 text-gray-500" />
+            {currentUser?.avatar ? (
+              <Image src={currentUser.avatar} alt="Avatar" containerClassName="h-full w-full"  className="h-full w-full object-cover"/>
+            ) : (
+              <User className="h-5 w-5 text-gray-500" />
+            )}
           </div>
           <span className="hidden text-sm font-medium text-gray-700 md:block">
             {currentUser?.name}

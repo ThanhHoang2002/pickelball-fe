@@ -22,9 +22,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ROLES } from "@/constant/role";
-import { useToast } from "@/hooks/use-toast";
 import { useAuthFormStore } from "@/features/auth/stores/authFormStore";
 import useAuthStore from "@/features/auth/stores/authStore";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/utils/cn";
 export interface AuthDialogProps {
     isOpen: boolean;
@@ -108,7 +108,7 @@ export const AuthDialog = ({
       localStorage.setItem('accessToken', response.access_token);
       setIsOpen(false)
       setCurrentUser(response.user)
-      if(response.user.role.name === ROLES.ADMIN){
+      if(response.user.role.name.toLowerCase() === ROLES.ADMIN.toLocaleLowerCase()){
         navigate('/admin')
       }else{
         navigate('/');

@@ -9,7 +9,7 @@ interface AdminGuardProps {
 }
 const AdminGuard = ({ children }: AdminGuardProps) => {
     const { currentUser } = useAuthStore(); 
-    if (currentUser?.role?.name !== "ADMIN") {
+    if (currentUser?.role?.name.toLocaleLowerCase() !== "admin") {
         return <Navigate to="/" />;
     }
     return children || <Outlet />;

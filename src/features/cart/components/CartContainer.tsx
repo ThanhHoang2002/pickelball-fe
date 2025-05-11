@@ -1,9 +1,20 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { CartSummary } from './CartSummary';
 import { useCart } from '../hooks/useCart';
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+
 export const CartContainer = () => {
+  const [clearCartDialogOpen, setClearCartDialogOpen] = useState(false);
   const {
     items,
     removeItem,
@@ -18,19 +29,24 @@ export const CartContainer = () => {
     error
   } = useCart();
 
+  const handleClearCart = () => {
+    setClearCartDialogOpen(false);
+    clearCart();
+  };
+
   if (isEmpty && !isLoading) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">Giỏ hàng của bạn</h1>
-          <p className="mt-4 text-gray-600">Giỏ hàng của bạn hiện đang trống.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Your cart</h1>
+          <p className="mt-4 text-gray-600">Your cart is empty.</p>
           <Link 
             to="/category/paddles" 
             className="mt-8 inline-block rounded-md bg-black px-6 py-3 text-white hover:bg-gray-800"
-            aria-label="Bắt đầu mua sắm"
+            aria-label="Start shopping"
             tabIndex={0}
           >
-            Tiếp tục mua sắm
+            Start shopping
           </Link>
         </div>
       </div>
@@ -48,7 +64,7 @@ export const CartContainer = () => {
               </svg>
             </div>
             <div className="ml-3">
-              <h3 className="text-sm font-medium text-red-800">Đã xảy ra lỗi</h3>
+              <h3 className="text-sm font-medium text-red-800">An error occurred</h3>
               <div className="mt-2 text-sm text-red-700">
                 <p>{error}</p>
               </div>
@@ -57,7 +73,7 @@ export const CartContainer = () => {
                   onClick={() => window.location.reload()}
                   className="rounded-md bg-red-100 px-4 py-2 text-sm font-medium text-red-800 hover:bg-red-200"
                 >
-                  Thử lại
+                  Try again
                 </button>
               </div>
             </div>
@@ -80,7 +96,7 @@ export const CartContainer = () => {
         </div>
       )}
 
-      <h1 className="mb-6 text-2xl font-bold text-gray-900">Giỏ hàng của bạn</h1>
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">Your cart</h1>
       
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Cart Items */}
@@ -88,10 +104,10 @@ export const CartContainer = () => {
           <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow">
             <div className="border-b border-gray-200 bg-gray-50 px-4 py-3">
               <div className="grid grid-cols-12 items-center text-sm font-medium text-gray-700">
-                <div className="col-span-6 px-2">SẢN PHẨM</div>
-                <div className="col-span-2 px-2 text-center">GIÁ</div>
-                <div className="col-span-2 px-2 text-center">SỐ LƯỢNG</div>
-                <div className="col-span-2 px-2 text-right">THÀNH TIỀN</div>
+                <div className="col-span-6 px-2">PRODUCT</div>
+                <div className="col-span-2 px-2 text-center">PRICE</div>
+                <div className="col-span-2 px-2 text-center">QUANTITY</div>
+                <div className="col-span-2 px-2 text-right">TOTAL</div>
               </div>
             </div>
             
@@ -119,7 +135,7 @@ export const CartContainer = () => {
                   
                   {/* Price */}
                   <div className="col-span-2 text-center text-sm text-gray-700">
-                    {item.price.toLocaleString()} đ
+                    {item.price.toLocaleString()} $
                   </div>
                   
                   {/* Quantity */}
@@ -128,7 +144,7 @@ export const CartContainer = () => {
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="flex h-8 w-8 items-center justify-center rounded-l border border-gray-300 bg-gray-50 text-gray-600 transition hover:bg-gray-100"
-                        aria-label="Giảm số lượng"
+                        aria-label="Decrease quantity"
                         disabled={isLoading}
                       >
                         -
@@ -139,7 +155,7 @@ export const CartContainer = () => {
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="flex h-8 w-8 items-center justify-center rounded-r border border-gray-300 bg-gray-50 text-gray-600 transition hover:bg-gray-100"
-                        aria-label="Tăng số lượng"
+                        aria-label="Increase quantity"
                         disabled={isLoading}
                       >
                         +
@@ -150,12 +166,12 @@ export const CartContainer = () => {
                   {/* Total & Remove */}
                   <div className="col-span-2 flex items-center justify-end gap-3">
                     <div className="text-sm font-medium text-gray-900">
-                      {(item.price * item.quantity).toLocaleString()} đ
+                      {(item.price * item.quantity).toLocaleString()} $
                     </div>
                     <button
                       onClick={() => removeItem(item.id)}
                       className="text-gray-400 hover:text-red-600"
-                      aria-label={`Xóa ${item.name} khỏi giỏ hàng`}
+                      aria-label={`Remove ${item.name} from cart`}
                       disabled={isLoading}
                     >
                       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
@@ -176,17 +192,17 @@ export const CartContainer = () => {
               <Link 
                 to="/category/paddles" 
                 className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
-                aria-label="Tiếp tục mua sắm"
+                aria-label="Continue shopping"
               >
-                Tiếp tục mua sắm
+                Continue shopping
               </Link>
               <button 
-                onClick={() => clearCart()}
+                onClick={() => setClearCartDialogOpen(true)}
                 disabled={isLoading}
                 className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-gray-50 hover:text-red-800 disabled:cursor-not-allowed disabled:opacity-50"
-                aria-label="Xóa giỏ hàng"
+                aria-label="Clear cart"
               >
-                Xóa giỏ hàng
+                Clear cart
               </button>
             </div>
           </div>
@@ -202,6 +218,32 @@ export const CartContainer = () => {
           />
         </div>
       </div>
+
+      {/* Clear Cart Confirmation Dialog */}
+      <Dialog open={clearCartDialogOpen} onOpenChange={setClearCartDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Clear cart</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to remove all items from your cart? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-2 pt-4">
+            <button
+              onClick={() => setClearCartDialogOpen(false)}
+              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleClearCart}
+              className="rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-red-700"
+            >
+              Clear cart
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }; 
