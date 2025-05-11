@@ -23,8 +23,8 @@ export const RegisterForm = ({
       <div>
         <FormField
           id="name"
-          label="Họ và tên"
-          placeholder="Nguyễn Văn A"
+          label="Full name"
+          placeholder="Nguyen Van A"
           error={errors.name}
           disabled={isSubmitting}
           registration={register("name")}
@@ -44,7 +44,7 @@ export const RegisterForm = ({
       <div>
         <FormField
           id="registerPassword"
-          label="Mật khẩu"
+          label="Password"
           type="password"
           placeholder="••••••••"
           error={errors.password}
@@ -56,7 +56,7 @@ export const RegisterForm = ({
       <div>
         <FormField
           id="confirmPassword"
-          label="Xác nhận mật khẩu"
+          label="Confirm password"
           type="password"
           placeholder="••••••••"
           error={errors.confirmPassword}
@@ -67,7 +67,7 @@ export const RegisterForm = ({
 
       <div>
         <label htmlFor="gender" className="mb-1 block pt-1 text-sm font-medium text-gray-700">
-          Giới tính
+          Gender
         </label>
         <select
           id="gender"
@@ -75,9 +75,9 @@ export const RegisterForm = ({
           disabled={isSubmitting}
           {...register("gender")}
         >
-          <option value="MALE">Nam</option>
-          <option value="FEMALE">Nữ</option>
-          <option value="OTHER">Khác</option>
+          <option value="MALE">Male</option>
+          <option value="FEMALE">Female</option>
+          <option value="OTHER">Other</option>
         </select>
         {errors.gender && (
           <p className="mt-1 text-xs text-red-500">{errors.gender.message}</p>
@@ -87,8 +87,8 @@ export const RegisterForm = ({
       <div>
         <FormField
           id="address"
-          label="Địa chỉ"
-          placeholder="Hà Nội"
+          label="Address"
+          placeholder="Hanoi"
           error={errors.address}
           disabled={isSubmitting}
           registration={register("address")}
@@ -104,7 +104,7 @@ export const RegisterForm = ({
           disabled={isSubmitting}
         />
         <label htmlFor="terms" className="text-sm text-gray-600">
-          Tôi đồng ý với điều khoản và chính sách bảo mật
+          I agree to the terms and conditions
         </label>
       </div>
       
@@ -118,7 +118,7 @@ export const RegisterForm = ({
           className="h-12 w-full text-base font-medium"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Đang xử lý..." : "Đăng ký"}
+          {isSubmitting ? "Processing..." : "Register"}
         </Button>
       </div>
     </form>

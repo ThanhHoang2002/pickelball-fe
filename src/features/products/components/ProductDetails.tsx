@@ -16,16 +16,16 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
   const { addItem } = useCart();
 
   const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity >= 1 && newQuantity <= product.quantity) {
+    if (newQuantity >= 1 && newQuantity <= product?.quantity) {
       setQuantity(newQuantity);
     }
   };
 
   const handleAddToCart = () => {
-    addItem(product.id, quantity);
+    addItem(product?.id, quantity);
   };
 
-  const formattedDescription = product.description
+  const formattedDescription = product?.description
     .split('|')
     .map(paragraph => paragraph.trim())
     .filter(Boolean)
@@ -46,8 +46,8 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
           transition={{ duration: 0.5 }}
         >
           <img
-            src={product.image}
-            alt={product.name}
+            src={product?.image}
+            alt={product?.name}
             className="h-full w-full object-cover object-center"
           />
         </motion.div>
@@ -60,17 +60,17 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900">{product.name}</h1>
+        <h1 className="text-3xl font-bold text-gray-900">{product?.name}</h1>
         
-        {product.supplier && (
+        {product?.supplier && (
           <div className="mt-2 text-sm text-gray-600">
-            Thương hiệu: {product.supplier.name}
+            Brand: {product?.supplier.name}
           </div>
         )}
         
         <div className="mt-4 flex items-center">
           <span className="text-2xl font-semibold text-gray-900">
-            {product.sellPrice.toLocaleString()}đ
+            {product?.sellPrice.toLocaleString()}$
           </span>
         </div>
 
@@ -81,7 +81,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
           {formattedDescription}
         </div>
         
-        {formattedDescription.length > 0 && (
+        {formattedDescription && formattedDescription.length > 0 && (
           <button 
             onClick={toggleDescription}
             className="mt-1 text-left text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline focus:outline-none"
@@ -105,7 +105,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
             <button
               onClick={() => handleQuantityChange(quantity + 1)}
               className="rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 hover:bg-gray-100"
-              disabled={quantity >= product.quantity}
+              disabled={quantity >= product?.quantity}
             >
               +
             </button>
@@ -118,9 +118,9 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
           className="mt-8 w-full rounded-md bg-black py-3 text-center text-base font-medium text-white hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:bg-gray-400"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          disabled={product.quantity <= 0}
+          disabled={product?.quantity <= 0}
         >
-          {product.quantity > 0 ? 'Add to cart' : 'Out of stock'}
+          {product?.quantity > 0 ? 'Add to cart' : 'Out of stock'}
         </motion.button>
 
         {/* Product information */}
@@ -129,25 +129,25 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
           <div className="mt-4 space-y-3">
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Product code</span>
-              <span className="text-sm font-medium">{product.id}</span>
+              <span className="text-sm font-medium">{product?.id}</span>
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Category</span>
-              <span className="text-sm font-medium">{product.category?.name || 'N/A'}</span>
+              <span className="text-sm font-medium">{product?.category?.name || 'N/A'}</span>
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Supplier</span>
-              <span className="text-sm font-medium">{product.supplier?.name || 'N/A'}</span>
+              <span className="text-sm font-medium">{product?.supplier?.name || 'N/A'}</span>
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Status</span>
-              <span className={`text-sm font-medium ${product.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {product.quantity > 0 ? 'In stock' : 'Out of stock'}
+              <span className={`text-sm font-medium ${product?.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {product?.quantity > 0 ? 'In stock' : 'Out of stock'}
               </span>
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Remaining quantity</span>
-              <span className="text-sm font-medium">{product.quantity}</span>
+              <span className="text-sm font-medium">{product?.quantity}</span>
             </div>
           </div>
         </div>

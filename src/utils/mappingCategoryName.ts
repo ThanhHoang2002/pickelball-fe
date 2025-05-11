@@ -1,15 +1,16 @@
-export const mappingCategoryName = (categoryName: string) => {
-  switch (categoryName) {
-    case 'Vợt':
-      return 'paddles';
-    case 'Phụ kiện':
-      return 'accessories';
-    case 'paddle':
-      return 'Vợt';
-    case 'accessories':
-      return 'Phụ kiện';
-    default:
-      return categoryName;
-  }
-}
-
+/**
+ * Maps UI category names to API category names
+ * @param categoryName The UI-friendly category name to be mapped to API category name
+ * @returns The API category name
+ */
+export function mappingCategoryName(categoryName: string): string {
+  const categoryMap: Record<string, string> = {
+    'paddles': 'Paddles',
+    'accessories': 'Accessories',
+    'vợt': 'Paddles',
+    'phụ kiện': 'Accessories'
+  };
+  
+  const normalizedCategoryName = categoryName.toLowerCase();
+  return categoryMap[normalizedCategoryName] || categoryName;
+} 
