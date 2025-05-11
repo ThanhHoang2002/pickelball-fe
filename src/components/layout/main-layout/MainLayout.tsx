@@ -5,7 +5,8 @@ import Footer from './Footer';
 import { Navbar } from './navbar/Navbar';
 
 import { AuthDialog } from '@/features/auth/components/AuthDialog';
-import { useAuthFormStore } from '@/stores/authFormStore';
+import { useAuthFormStore } from '@/features/auth/stores/authFormStore';
+import { ChatWidget } from '@/features/chat/components/ChatWidget';
 
 export const MainLayout = () => {
   const location = useLocation();
@@ -24,6 +25,7 @@ export const MainLayout = () => {
         <Outlet />
       </main>
       {isOpen && <AuthDialog isOpen={isOpen} onClose={() => setIsOpen(false)} />}
+        <ChatWidget />
       <Footer />
     </div>
   );

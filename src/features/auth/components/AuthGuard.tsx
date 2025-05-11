@@ -6,8 +6,8 @@ import { Outlet, useNavigate } from "react-router-dom";
 
 import GlobalLoading from "@/components/loading/GlobalLoading";
 import { getCurrentUser } from "@/features/auth/apis/getCurrentUser";
-import { useAuthFormStore } from "@/stores/authFormStore";
-import useAuthStore from "@/stores/authStore";
+import { useAuthFormStore } from "@/features/auth/stores/authFormStore";
+import useAuthStore from "@/features/auth/stores/authStore";
 
 interface AuthGuardProps {
     children?: ReactNode

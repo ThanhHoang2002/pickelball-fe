@@ -23,8 +23,8 @@ import {
 } from "@/components/ui/dialog";
 import { ROLES } from "@/constant/role";
 import { useToast } from "@/hooks/use-toast";
-import { useAuthFormStore } from "@/stores/authFormStore";
-import useAuthStore from "@/stores/authStore";
+import { useAuthFormStore } from "@/features/auth/stores/authFormStore";
+import useAuthStore from "@/features/auth/stores/authStore";
 import { cn } from "@/utils/cn";
 export interface AuthDialogProps {
     isOpen: boolean;

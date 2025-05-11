@@ -12,8 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useAuthFormStore } from "@/stores/authFormStore";
-import useAuthStore from "@/stores/authStore";
+import { useAuthFormStore } from "@/features/auth/stores/authFormStore";
+import useAuthStore from "@/features/auth/stores/authStore";
 
 interface SubMenu {
   label: string;
