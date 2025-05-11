@@ -1,6 +1,5 @@
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useDebounceSearch } from "@/hooks/useDebounce";
 
@@ -9,7 +8,7 @@ interface CategoryToolbarProps {
   onAddNew: () => void;
 }
 
-export const CategoryToolbar = ({ onSearch, onAddNew }: CategoryToolbarProps) => {
+export const CategoryToolbar = ({ onSearch }: CategoryToolbarProps) => {
   // Sử dụng hook useDebounceSearch để tự động search khi người dùng gõ
   const { searchTerm, setSearchTerm } = useDebounceSearch(onSearch, {
     delay: 500, // Độ trễ 500ms
@@ -21,7 +20,7 @@ export const CategoryToolbar = ({ onSearch, onAddNew }: CategoryToolbarProps) =>
         <div className="relative w-full">
           <Input
             type="text"
-            placeholder="Tìm kiếm danh mục..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="h-9 w-full pr-8"
@@ -29,11 +28,6 @@ export const CategoryToolbar = ({ onSearch, onAddNew }: CategoryToolbarProps) =>
           <Search className="absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         </div>
       </div>
-
-      <Button onClick={onAddNew} size="sm" className="flex items-center gap-1">
-        <Plus className="h-4 w-4" />
-        Thêm danh mục
-      </Button>
     </div>
   );
 }; 

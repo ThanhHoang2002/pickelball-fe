@@ -19,8 +19,8 @@ const DashboardPage = lazy(() => import('@/app/pages/admin/DashboardPage'));
 const ProductPage = lazy(() => import('@/app/pages/admin/ProductPage'));
 const OrderPage = lazy(() => import('@/app/pages/admin/OrderPage'));
 const CustomerPage = lazy(() => import('@/app/pages/admin/CustomerPage'));
-const Supplier = lazy(() => import('@/app/pages/admin/Supplier'));
-
+const Supplier = lazy(() => import('@/app/pages/admin/SupplierPage'));
+const AdminCategoryPage = lazy(() => import('@/app/pages/admin/CategoryPage'));
 const router = createBrowserRouter([
   {
     path: '/',
@@ -85,6 +85,10 @@ const router = createBrowserRouter([
       {
         path: 'customers',
         element: <CustomerPage />,
+      },
+      {
+        path: 'categories',
+        element: <AdminCategoryPage />,
       },
       {
         path: 'suppliers',

@@ -1,5 +1,7 @@
-import { Mail, Phone, MapPin, Calendar, ShoppingBag, DollarSign, AlertCircle } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar, Mail, MapPin } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,6 +10,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { Customer } from "@/types/customer";
 
 interface CustomerDetailProps {
@@ -16,132 +19,100 @@ interface CustomerDetailProps {
   customer: Customer;
 }
 
-const CustomerDetail = ({ open, onClose, customer }: CustomerDetailProps) => {
-  // Format date to readable format
-  const formatDate = (dateString: string | undefined) => {
+export const CustomerDetail = ({ open, onClose, customer }: CustomerDetailProps) => {
+  // Format date
+  const formatDate = (dateString: string | null) => {
     if (!dateString) return "N/A";
-    
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('vi-VN', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    }).format(date);
-  };
-
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND',
-    }).format(amount);
+    return format(new Date(dateString), "dd/MM/yyyy HH:mm");
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle className="text-xl">
-            Thông tin khách hàng
-          </DialogTitle>
+          <DialogTitle className="text-xl">Customer Details</DialogTitle>
         </DialogHeader>
-
-        <div className="grid grid-cols-1 gap-8 py-4 md:grid-cols-3">
-          {/* Avatar and Status */}
-          <div className="text-center">
-            <div className="mx-auto mb-3 h-28 w-28 overflow-hidden rounded-full">
-              <img
-                src={customer.avatar || "https://api.dicebear.com/7.x/adventurer/svg?seed=Default"}
-                alt={customer.name}
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <h3 className="mb-1 text-lg font-semibold">{customer.name}</h3>
-            <div className="mb-3">
-              <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${
-                customer.status === 'active' 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {customer.status === 'active' ? 'Hoạt động' : 'Không hoạt động'}
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Khách hàng từ {formatDate(customer.createdAt)}
-            </p>
+        
+        {/* Customer Header */}
+        <div className="flex flex-col items-center sm:flex-row sm:items-start sm:gap-4">
+          <div className="h-24 w-24 overflow-hidden rounded-full border">
+            <img
+              src={customer.avatar || "https://api.dicebear.com/7.x/initials/svg?seed=" + encodeURIComponent(customer.name)}
+              alt={customer.name}
+              className="h-full w-full object-cover"
+            />
           </div>
-
-          {/* Contact Information */}
-          <div className="col-span-2 space-y-4">
-            {/* Contact Details */}
-            <div className="rounded-lg border p-4">
-              <h4 className="mb-3 font-medium">Thông tin liên hệ</h4>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-start gap-2">
-                  <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                  <span>{customer.email}</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <Phone className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                  <span>{customer.phone}</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                  <span>{customer.address}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Order Statistics */}
-            <div className="rounded-lg border p-4">
-              <h4 className="mb-3 font-medium">Đơn hàng & Thanh toán</h4>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="rounded-md bg-primary/10 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tổng đơn hàng</span>
-                    <ShoppingBag className="h-4 w-4 text-primary" />
-                  </div>
-                  <p className="mt-1 text-xl font-semibold">{customer.totalOrders}</p>
-                </div>
-                <div className="rounded-md bg-primary/10 p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Tổng thanh toán</span>
-                    <DollarSign className="h-4 w-4 text-primary" />
-                  </div>
-                  <p className="mt-1 text-xl font-semibold">{formatCurrency(customer.totalSpent)}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Additional Information */}
-            <div className="space-y-2 rounded-lg border p-4">
-              <div className="flex items-start gap-2">
-                <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
-                <div>
-                  <span className="text-sm text-muted-foreground">Đơn hàng gần nhất:</span>
-                  <span className="ml-1">{formatDate(customer.lastOrderDate)}</span>
-                </div>
-              </div>
-              
-              {customer.notes && (
-                <div className="flex items-start gap-2">
-                  <AlertCircle className="mt-0.5 h-4 w-4 text-amber-500" />
-                  <div>
-                    <span className="text-sm font-medium">Ghi chú:</span>
-                    <p className="text-sm">{customer.notes}</p>
-                  </div>
-                </div>
+          
+          <div className="mt-3 text-center sm:mt-0 sm:flex-1 sm:text-left">
+            <h3 className="text-lg font-semibold">{customer.name}</h3>
+            <p className="text-sm text-muted-foreground">ID: {customer.id}</p>
+            
+            <div className="mt-2">
+              <Badge variant="outline" className="capitalize">
+                {customer.role.name}
+              </Badge>
+              {customer.gender && (
+                <Badge variant="outline" className="ml-2 capitalize">
+                  {customer.gender.toLowerCase()}
+                </Badge>
               )}
             </div>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>
-            Đóng
-          </Button>
-          <Button type="button">
-            Xem đơn hàng
+        
+        <Separator className="my-4" />
+        
+        {/* Contact Information */}
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold">Contact Information</h4>
+          
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex items-start gap-2 rounded-md border p-3">
+              <Mail className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">Email</p>
+                <p className="break-all text-sm">{customer.email}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-2 rounded-md border p-3">
+              <MapPin className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">Address</p>
+                <p className="text-sm">{customer.address || "N/A"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <Separator className="my-4" />
+        
+        {/* Account Information */}
+        <div className="space-y-4">
+          <h4 className="text-sm font-semibold">Account Information</h4>
+          
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex items-start gap-2 rounded-md border p-3">
+              <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">Created At</p>
+                <p className="text-sm">{formatDate(customer.createdAt)}</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start gap-2 rounded-md border p-3">
+              <Calendar className="mt-0.5 h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-xs text-muted-foreground">Last Updated</p>
+                <p className="text-sm">{formatDate(customer.updatedAt)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <DialogFooter className="mt-6">
+          <Button variant="outline" onClick={onClose}>
+            Close
           </Button>
         </DialogFooter>
       </DialogContent>
