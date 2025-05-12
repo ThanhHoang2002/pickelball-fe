@@ -1,14 +1,19 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { CheckCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
-export const OrderConfirmation = () => {
+const OrderConfirmation = () => {
   const { orderId } = useParams<{ orderId: string }>();
+  const queryClient = useQueryClient();
 
-  // Scroll to top on component mount
+  // Scroll to top on component mount and invalidate cart
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    
+    // Vô hiệu hóa truy vấn giỏ hàng sau khi trang đã được hiển thị
+    queryClient.invalidateQueries({ queryKey: ['cart'] });
+  }, [queryClient]);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
@@ -49,3 +54,5 @@ export const OrderConfirmation = () => {
     </div>
   );
 }; 
+
+export default OrderConfirmation;

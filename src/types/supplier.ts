@@ -21,7 +21,7 @@ export interface SupplierResponse {
 
 export interface SupplierFilterParams {
   page?: number;
-  pageSize?: number;
+  size?: number;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
   search?: string;

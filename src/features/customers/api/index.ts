@@ -2,7 +2,7 @@ import { Item, sfAnd, sfEqual, sfLike } from "spring-filter-query-builder";
 
 import axiosClient from "@/lib/axios-client";
 import { ApiResponse } from "@/types/apiResponse";
-import { CustomerFilterParams, CustomerResponse } from "@/types/customer";
+import { CustomerFilterParams, CustomerResponse, Customer } from "@/types/customer";
 
 /**
  * Lấy danh sách khách hàng
@@ -21,7 +21,7 @@ export const getCustomers = async (
   const response = await axiosClient.get<ApiResponse<CustomerResponse>>("/users", {
     params: {
       page: params.page || 1,
-      pageSize: params.pageSize || 10,
+      size: params.size || 10,
       filter: filter.toString() === "()" ? undefined : filter.toString(),
       sortBy: params.sortBy,
       sortDirection: params.sortDirection,
@@ -33,7 +33,7 @@ export const getCustomers = async (
 /**
  * Lấy thông tin khách hàng theo ID
  */
-export const getCustomerById = async (id: number): Promise<CustomerResponse> => {
-  const response = await axiosClient.get<ApiResponse<CustomerResponse>>(`/users/${id}`);
+export const getCustomerById = async (id: number): Promise<Customer> => {
+  const response = await axiosClient.get<ApiResponse<Customer>>(`/users/${id}`);
   return response.data.data;
 }; 

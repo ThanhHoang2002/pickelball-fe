@@ -65,4 +65,5 @@ export interface OrderFilterParams {
   sortDirection?: 'asc' | 'desc';
   fromDate?: string;
   toDate?: string;
+  userId?: number;
 } 

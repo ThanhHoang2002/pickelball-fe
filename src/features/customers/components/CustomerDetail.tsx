@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { Calendar, Mail, MapPin } from "lucide-react";
+import { memo, useCallback } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -19,12 +20,12 @@ interface CustomerDetailProps {
   customer: Customer;
 }
 
-export const CustomerDetail = ({ open, onClose, customer }: CustomerDetailProps) => {
-  // Format date
-  const formatDate = (dateString: string | null) => {
+export const CustomerDetail = memo(({ open, onClose, customer }: CustomerDetailProps) => {
+  // Format date với useCallback để tránh tạo lại hàm mỗi khi render
+  const formatDate = useCallback((dateString: string | null) => {
     if (!dateString) return "N/A";
     return format(new Date(dateString), "dd/MM/yyyy HH:mm");
-  };
+  }, []);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -118,6 +119,8 @@ export const CustomerDetail = ({ open, onClose, customer }: CustomerDetailProps)
       </DialogContent>
     </Dialog>
   );
-};
+});
+
+CustomerDetail.displayName = 'CustomerDetail';
 
 export default CustomerDetail; 

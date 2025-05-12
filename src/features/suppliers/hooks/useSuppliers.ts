@@ -10,7 +10,7 @@ import { SupplierFilterParams } from "@/types/supplier";
 export const useSuppliers = (initialFilters: SupplierFilterParams = {}) => {
   const [filters, setFilters] = useState<SupplierFilterParams>({
     page: initialFilters.page || 1,
-    pageSize: initialFilters.pageSize || 10,
+    size: initialFilters.size || 10,
     sortBy: initialFilters.sortBy,
     sortDirection: initialFilters.sortDirection,
     search: initialFilters.search || "",
@@ -122,7 +122,7 @@ export const useSuppliers = (initialFilters: SupplierFilterParams = {}) => {
   const resetFilters = () => {
     setFilters({
       page: 1,
-      pageSize: 10,
+      size: 10,
       search: "",
     });
     setSearchTerm("");
@@ -137,7 +137,7 @@ export const useSuppliers = (initialFilters: SupplierFilterParams = {}) => {
     currentPage: filters.page || 1,
     totalPages: data?.meta.pages || 1,
     totalItems: data?.meta.total || 0,
-    itemsPerPage: filters.pageSize || 10,
+    itemsPerPage: filters.size || 10,
     filters,
     goToPage,
     handleSort,

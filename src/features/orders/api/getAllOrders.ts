@@ -16,6 +16,7 @@ export const getAllOrders = async (
       params.paymentMethod && sfEqual("paymentMethod", params.paymentMethod),
       params.fromDate && sfGe("createdAt", params.fromDate),
       params.toDate && sfLe("createdAt", params.toDate),
+      params.userId && sfEqual("user.id", params.userId),
     ].filter(Boolean) as Item[]
   );
   

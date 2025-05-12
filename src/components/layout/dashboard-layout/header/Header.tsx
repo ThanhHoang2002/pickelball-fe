@@ -1,6 +1,5 @@
 import { Menu } from 'lucide-react';
 
-import NotificationsMenu from './NotificationsMenu';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
 
@@ -36,10 +35,6 @@ const Header = ({ sidebarOpen, setSidebarOpen }: HeaderProps) => {
             <div>
               <ThemeToggle />
             </div>
-
-            {/* Notifications dropdown */}
-            <NotificationsMenu />
-
             {/* User dropdown */}
             <UserMenu />
           </div>

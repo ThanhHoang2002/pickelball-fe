@@ -7,9 +7,9 @@ import { useCart } from '@/features/cart/hooks/useCart';
 
 export const CheckoutContainer = () => {
   const { isEmpty, isLoading: isCartLoading } = useCart();
-
   // Redirect to cart if cart is empty
   if (isEmpty && !isCartLoading) {
+    console.log('cart is empty')
     return <Navigate to="/cart" replace />;
   }
 

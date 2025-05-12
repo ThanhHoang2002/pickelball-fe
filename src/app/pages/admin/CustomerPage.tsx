@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Search, Eye, ChevronLeft, ChevronRight, Calendar, Mail, User } from 'lucide-react';
-import { useEffect, useState, useCallback } from 'react';
+import { useState, memo, useCallback, useMemo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,63 +12,163 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getCustomers } from '@/features/customers/api';
 import CustomerDetail from '@/features/customers/components/CustomerDetail';
-import { useDebounceSearch } from '@/hooks/useDebounce';
-import { Customer, CustomerFilterParams } from '@/types/customer';
+import { useCustomers } from '@/features/customers/hooks/useCustomers';
+import { Customer } from '@/types/customer';
 
+// Tách riêng thành component con để tránh re-render không cần thiết
+const CustomerRow = memo(({ 
+  customer, 
+  onViewCustomer, 
+  formatDate 
+}: { 
+  customer: Customer; 
+  onViewCustomer: (customer: Customer) => void;
+  formatDate: (dateString: string | null) => string;
+}) => {
+  return (
+    <TableRow key={customer.id}>
+      <TableCell>
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 overflow-hidden rounded-full">
+            <img
+              src={customer.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(customer.name)}`}
+              alt={customer.name}
+              className="h-full w-full object-cover"
+            />
+          </div>
+          <div>
+            <p className="font-medium">{customer.name}</p>
+            <p className="text-xs text-muted-foreground">#{customer.id}</p>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="space-y-1">
+          <div className="flex items-center gap-1">
+            <Mail className="h-3 w-3 text-muted-foreground" />
+            <span className="max-w-[200px] truncate text-sm" title={customer.email}>
+              {customer.email}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <User className="h-3 w-3 text-muted-foreground" />
+            <span className="text-sm capitalize">{customer.gender.toLowerCase()}</span>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1">
+          <Calendar className="h-3 w-3 text-muted-foreground" />
+          <span className="text-sm">{formatDate(customer.createdAt)}</span>
+        </div>
+      </TableCell>
+      <TableCell className="text-right">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-8 w-8 p-0"
+          onClick={() => onViewCustomer(customer)}
+        >
+          <Eye className="h-4 w-4" />
+          <span className="sr-only">View details</span>
+        </Button>
+      </TableCell>
+    </TableRow>
+  );
+});
+
+CustomerRow.displayName = 'CustomerRow';
+
+// Tách phân trang thành component riêng
+const Pagination = memo(({ 
+  currentPage, 
+  totalPages, 
+  totalItems, 
+  itemsPerPage, 
+  goToPage 
+}: { 
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  itemsPerPage: number;
+  goToPage: (page: number) => void; 
+}) => {
+  return (
+    <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+      <div>
+        Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} customers
+      </div>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => goToPage(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft size={16} />
+        </Button>
+        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+          let pageNumber;
+          if (totalPages <= 5) {
+            pageNumber = i + 1;
+          } else if (currentPage <= 3) {
+            pageNumber = i + 1;
+          } else if (currentPage >= totalPages - 2) {
+            pageNumber = totalPages - 4 + i;
+          } else {
+            pageNumber = currentPage - 2 + i;
+          }
+
+          return (
+            <Button
+              key={pageNumber}
+              variant={currentPage === pageNumber ? "default" : "outline"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => goToPage(pageNumber)}
+            >
+              {pageNumber}
+            </Button>
+          );
+        })}
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => goToPage(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronRight size={16} />
+        </Button>
+      </div>
+    </div>
+  );
+});
+
+Pagination.displayName = 'Pagination';
 
 const CustomerPage = () => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [isCustomerDetailOpen, setIsCustomerDetailOpen] = useState(false);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [totalPages, setTotalPages] = useState(1);
-  const [totalItems, setTotalItems] = useState(0);
-  const [loading, setLoading] = useState(false);
+  
+  // Sử dụng custom hook
+  const { 
+    customers,
+    loading,
+    searchTerm,
+    setSearchTerm,
+    currentPage,
+    totalPages,
+    totalItems,
+    itemsPerPage,
+    goToPage,
+    fetchCustomerById
+  } = useCustomers();
 
-  // Fetch customers
-  const fetchCustomers = useCallback(async (searchValue: string = '') => {
-    setLoading(true);
-    try {
-      const params: CustomerFilterParams = {
-        page: currentPage,
-        pageSize: itemsPerPage,
-        search: searchValue || undefined
-      };
-      
-      const response = await getCustomers(params);
-      setCustomers(response.result);
-      setTotalPages(response.meta.pages);
-      setTotalItems(response.meta.total);
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [currentPage, itemsPerPage]);
-
-  // Use debounced search
-  const { searchTerm, setSearchTerm } = useDebounceSearch((value) => {
-    // Reset to page 1 when search term changes
-    setCurrentPage(1);
-    fetchCustomers(value);
-  }, { delay: 500 });
-  
-  // Load data on initial render and when pagination changes
-  useEffect(() => {
-    fetchCustomers(searchTerm);
-  }, [fetchCustomers, currentPage]);
-  
-  // View customer details
-  const handleViewCustomer = (customer: Customer) => {
-    setCurrentCustomer(customer);
-    setIsCustomerDetailOpen(true);
-  };
-  
-  // Format date
-  const formatDate = (dateString: string | null) => {
+  // Format date - memoize để tránh tạo lại hàm mỗi lần render
+  const formatDate = useCallback((dateString: string | null) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -76,14 +176,39 @@ const CustomerPage = () => {
       month: '2-digit',
       day: '2-digit',
     }).format(date);
-  };
+  }, []);
   
-  // Pagination navigation
-  const goToPage = (page: number) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+  // View customer details và đảm bảo không gọi API nhiều lần
+  const handleViewCustomer = useCallback(async (customer: Customer) => {
+    try {
+      // Lấy thông tin chi tiết khách hàng từ cache hoặc API
+      const detailedCustomer = await fetchCustomerById(customer.id);
+      setCurrentCustomer(detailedCustomer);
+      setIsCustomerDetailOpen(true);
+    } catch (error) {
+      console.error("Error fetching customer details:", error);
+      // Fallback nếu không lấy được thông tin chi tiết
+      setCurrentCustomer(customer);
+      setIsCustomerDetailOpen(true);
     }
-  };
+  }, [fetchCustomerById]);
+
+  // Handle close dialog
+  const handleCloseDialog = useCallback(() => {
+    setIsCustomerDetailOpen(false);
+  }, []);
+
+  // Memoize danh sách customers để tránh re-render
+  const customersList = useMemo(() => {
+    return customers.map((customer) => (
+      <CustomerRow 
+        key={customer.id}
+        customer={customer}
+        onViewCustomer={handleViewCustomer}
+        formatDate={formatDate}
+      />
+    ));
+  }, [customers, handleViewCustomer, formatDate]);
 
   return (
     <motion.div 
@@ -135,56 +260,7 @@ const CustomerPage = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              customers.map((customer) => (
-                <TableRow key={customer.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 overflow-hidden rounded-full">
-                        <img
-                          src={customer.avatar || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(customer.name)}`}
-                          alt={customer.name}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <div>
-                        <p className="font-medium">{customer.name}</p>
-                        <p className="text-xs text-muted-foreground">#{customer.id}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1">
-                        <Mail className="h-3 w-3 text-muted-foreground" />
-                        <span className="max-w-[200px] truncate text-sm" title={customer.email}>
-                          {customer.email}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <User className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-sm capitalize">{customer.gender.toLowerCase()}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-sm">{formatDate(customer.createdAt)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-8 w-8 p-0"
-                      onClick={() => handleViewCustomer(customer)}
-                    >
-                      <Eye className="h-4 w-4" />
-                      <span className="sr-only">View details</span>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
+              customersList
             )}
           </TableBody>
         </Table>
@@ -192,62 +268,20 @@ const CustomerPage = () => {
       
       {/* Pagination */}
       {totalItems > 0 && (
-        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-          <div>
-            Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} customers
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => goToPage(currentPage - 1)}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft size={16} />
-            </Button>
-            {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-              let pageNumber;
-              if (totalPages <= 5) {
-                pageNumber = i + 1;
-              } else if (currentPage <= 3) {
-                pageNumber = i + 1;
-              } else if (currentPage >= totalPages - 2) {
-                pageNumber = totalPages - 4 + i;
-              } else {
-                pageNumber = currentPage - 2 + i;
-              }
-
-              return (
-                <Button
-                  key={pageNumber}
-                  variant={currentPage === pageNumber ? "default" : "outline"}
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => goToPage(pageNumber)}
-                >
-                  {pageNumber}
-                </Button>
-              );
-            })}
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => goToPage(currentPage + 1)}
-              disabled={currentPage === totalPages}
-            >
-              <ChevronRight size={16} />
-            </Button>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          goToPage={goToPage}
+        />
       )}
       
       {/* Customer Detail Dialog */}
       {currentCustomer && (
         <CustomerDetail
           open={isCustomerDetailOpen}
-          onClose={() => setIsCustomerDetailOpen(false)}
+          onClose={handleCloseDialog}
           customer={currentCustomer}
         />
       )}

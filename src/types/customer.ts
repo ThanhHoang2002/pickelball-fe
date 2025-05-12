@@ -28,7 +28,7 @@ export interface CustomerResponse {
 
 export interface CustomerFilterParams {
   page?: number;
-  pageSize?: number;
+  size?: number;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';
   search?: string;

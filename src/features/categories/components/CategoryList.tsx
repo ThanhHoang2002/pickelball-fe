@@ -1,4 +1,5 @@
 import { Package2Icon } from "lucide-react";
+import { memo } from "react";
 
 import EmptyState from "@/components/ui/empty-state";
 import { LoadingIndicator } from "@/components/ui/loading-indicator";
@@ -12,7 +13,7 @@ interface CategoryListProps {
   onDelete: (id: number) => void;
 }
 
-export const CategoryList = ({ categories, isLoading, onEdit, onDelete }: CategoryListProps) => {
+export const CategoryList = memo(({ categories, isLoading, onEdit, onDelete }: CategoryListProps) => {
   if (isLoading) {
     return (
       <div className="flex h-40 items-center justify-center">
@@ -43,4 +44,6 @@ export const CategoryList = ({ categories, isLoading, onEdit, onDelete }: Catego
       ))}
     </div>
   );
-}; 
+});
+
+CategoryList.displayName = 'CategoryList'; 

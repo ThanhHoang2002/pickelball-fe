@@ -1,5 +1,5 @@
 import { ImageIcon, MoreVertical, Pencil, Trash2 } from "lucide-react";
-import { useState, useCallback } from "react";
+import { useState, useCallback, memo } from "react";
 
 import { Category } from "../types";
 
@@ -19,7 +19,7 @@ interface CategoryCardProps {
   onDelete: (id: number) => void;
 }
 
-export const CategoryCard = ({ category, onEdit, onDelete }: CategoryCardProps) => {
+export const CategoryCard = memo(({ category, onEdit, onDelete }: CategoryCardProps) => {
   const { id, name, image, description, createdAt } = category;
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -96,4 +96,6 @@ export const CategoryCard = ({ category, onEdit, onDelete }: CategoryCardProps) 
       </CardFooter>
     </Card>
   );
-}; 
+});
+
+CategoryCard.displayName = 'CategoryCard'; 

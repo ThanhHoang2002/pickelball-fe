@@ -72,13 +72,13 @@ const ContactPage = () => {
     e.preventDefault();
     setSubmitting(true);
     
-    // Giả lập gửi form
+    // Simulate form submission
     setTimeout(() => {
       setSubmitting(false);
       setSubmitted(true);
       setFormData(initialFormData);
       
-      // Reset trạng thái sau 3 giây
+      // Reset state after 3 seconds
       setTimeout(() => {
         setSubmitted(false);
       }, 3000);
@@ -97,14 +97,14 @@ const ContactPage = () => {
           className="mb-12 text-center text-4xl font-bold text-gray-900"
           variants={fadeInUp}
         >
-          Liên hệ với chúng tôi
+          Contact Us
         </motion.h1>
         
         <div className="grid gap-10 md:grid-cols-2">
           {/* Contact Information */}
           <motion.div variants={fadeInUp}>
             <div className="rounded-xl border border-gray-100 bg-white p-8 shadow-md">
-              <h2 className="mb-6 text-2xl font-bold text-gray-900">Thông tin liên hệ</h2>
+              <h2 className="mb-6 text-2xl font-bold text-gray-900">Contact Information</h2>
               
               <div className="space-y-6">
                 <motion.div 
@@ -116,9 +116,9 @@ const ContactPage = () => {
                     <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-semibold text-gray-900">Địa chỉ</h3>
+                    <h3 className="text-base font-semibold text-gray-900">Address</h3>
                     <p className="mt-1 text-gray-600">
-                      Số 15, hẻm 76 ngách 51, ngõ Linh Quang, phường Văn Chương, quận Đống Đa, Hà Nội
+                      No. 15, Lane 76, Alley 51, Linh Quang Street, Van Chuong Ward, Dong Da District, Hanoi
                     </p>
                   </div>
                 </motion.div>
@@ -160,8 +160,8 @@ const ContactPage = () => {
                     <Clock className="h-5 w-5" />
                   </div>
                   <div>
-                    <h3 className="text-base font-semibold text-gray-900">Giờ làm việc</h3>
-                    <p className="mt-1 text-gray-600">Hàng ngày: 7h - 21h30</p>
+                    <h3 className="text-base font-semibold text-gray-900">Working Hours</h3>
+                    <p className="mt-1 text-gray-600">Daily: 7:00 AM - 9:30 PM</p>
                   </div>
                 </motion.div>
               </div>
@@ -170,7 +170,7 @@ const ContactPage = () => {
                 className="mt-8 border-t border-gray-100 pt-6"
                 variants={fadeInUp}
               >
-                <h3 className="mb-4 text-base font-semibold text-gray-900">Kết nối với chúng tôi</h3>
+                <h3 className="mb-4 text-base font-semibold text-gray-900">Connect with Us</h3>
                 <motion.div 
                   className="flex space-x-4"
                   variants={staggerChildren}
@@ -237,7 +237,7 @@ const ContactPage = () => {
             className="rounded-xl border border-gray-100 bg-white p-8 shadow-md"
             variants={fadeInUp}
           >
-            <h2 className="mb-8 text-2xl font-bold text-gray-900">Gửi tin nhắn cho chúng tôi</h2>
+            <h2 className="mb-8 text-2xl font-bold text-gray-900">Send Us a Message</h2>
             
             {submitted ? (
               <motion.div 
@@ -253,9 +253,9 @@ const ContactPage = () => {
                     </svg>
                   </div>
                   <div className="ml-3">
-                    <h3 className="text-lg font-medium text-green-800">Gửi tin nhắn thành công!</h3>
+                    <h3 className="text-lg font-medium text-green-800">Message sent successfully!</h3>
                     <p className="mt-2 text-base text-green-700">
-                      Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.
+                      Thank you for contacting us! We will respond as soon as possible.
                     </p>
                   </div>
                 </div>
@@ -269,7 +269,7 @@ const ContactPage = () => {
                 <div className="grid gap-6 md:grid-cols-2">
                   <motion.div variants={fadeInUp}>
                     <label htmlFor="name" className="mb-2 block text-sm font-medium">
-                      Họ và tên <span className="text-red-500">*</span>
+                      Full Name <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -301,7 +301,7 @@ const ContactPage = () => {
                 <div className="grid gap-6 md:grid-cols-2">
                   <motion.div variants={fadeInUp}>
                     <label htmlFor="phone" className="mb-2 block text-sm font-medium">
-                      Số điện thoại <span className="text-red-500">*</span>
+                      Phone Number <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="tel"
@@ -316,7 +316,7 @@ const ContactPage = () => {
                   
                   <motion.div variants={fadeInUp}>
                     <label htmlFor="subject" className="mb-2 block text-sm font-medium">
-                      Chủ đề
+                      Subject
                     </label>
                     <select
                       id="subject"
@@ -325,18 +325,18 @@ const ContactPage = () => {
                       onChange={handleChange}
                       className="w-full rounded-md border border-gray-300 px-4 py-2.5 transition-colors focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     >
-                      <option value="">Chọn chủ đề</option>
-                      <option value="order">Đặt hàng</option>
-                      <option value="feedback">Phản hồi</option>
-                      <option value="support">Hỗ trợ</option>
-                      <option value="other">Khác</option>
+                      <option value="">Select a subject</option>
+                      <option value="order">Order</option>
+                      <option value="feedback">Feedback</option>
+                      <option value="support">Support</option>
+                      <option value="other">Other</option>
                     </select>
                   </motion.div>
                 </div>
                 
                 <motion.div variants={fadeInUp}>
                   <label htmlFor="message" className="mb-2 block text-sm font-medium">
-                    Nội dung <span className="text-red-500">*</span>
+                    Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
                     id="message"
@@ -362,12 +362,12 @@ const ContactPage = () => {
                     {submitting ? (
                       <div className="flex items-center gap-2">
                         <LoaderCircle className="h-4 w-4 animate-spin" />
-                        <span>Đang gửi...</span>
+                        <span>Sending...</span>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
                         <Send className="h-4 w-4" />
-                        <span>Gửi tin nhắn</span>
+                        <span>Send Message</span>
                       </div>
                     )}
                   </Button>

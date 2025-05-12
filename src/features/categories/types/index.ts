@@ -1,4 +1,5 @@
-import { ApiResponse, Meta } from "@/types/apiResponse.type";
+import { ApiResponse } from "@/types/apiResponse";
+import { Meta } from "@/types/detailResponse";
 
 export interface Category {
   id: number;
@@ -21,7 +22,7 @@ export type CategoryResponse = ApiResponse<CategoryPagination>;
 export interface CategoryFilterParams {
   search?: string;      // Tìm kiếm theo tên và mô tả
   page?: number;        // Trang hiện tại
-  pageSize?: number;    // Số item trên một trang
+  size?: number;    // Số item trên một trang
   sortBy?: string;      // Sắp xếp theo trường nào
   sortOrder?: 'asc' | 'desc';  // Thứ tự sắp xếp
 }

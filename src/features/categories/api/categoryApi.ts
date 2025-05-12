@@ -44,7 +44,7 @@ export const getCategories = async (params: CategoryFilterParams = {}): Promise<
     sort?: string;
   } = {
     page: params.page || 1,
-    size: params.pageSize || 20,
+    size: params.size || 20,
   };
   
   // Nếu có filter, thêm vào request params

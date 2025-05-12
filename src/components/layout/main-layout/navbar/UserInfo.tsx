@@ -2,7 +2,8 @@ import {
   User, 
   UserCircle, 
   ChevronDown,
-  LogOut
+  LogOut,
+  ShoppingBag
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -23,7 +24,8 @@ interface SubMenu {
 }
 
 const subMenus: SubMenu[] = [
-  { label: "Thông tin cá nhân", icon: <UserCircle />, to: "/profile" },
+  { label: "Personal Information", icon: <UserCircle />, to: "/profile" },
+  { label: "My Orders", icon: <ShoppingBag />, to:"/my-orders"}
 ];
 
 const UserInfo = () => {
@@ -71,7 +73,7 @@ const UserInfo = () => {
         <DropdownMenuItem asChild className="cursor-pointer">
           <button onClick={handleLogout} className="flex w-full cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
-            <span>Đăng xuất</span>
+            <span>Logout</span>
           </button>
         </DropdownMenuItem>
       </DropdownMenuContent>

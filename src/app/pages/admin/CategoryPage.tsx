@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Calendar, ChevronLeft, ChevronRight, FileText, MoreVertical, ArrowUpDown, Plus, Pencil, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -31,6 +31,246 @@ import { useCategories } from '@/features/categories/hooks/useCategories';
 import { useDeleteCategory } from '@/features/categories/hooks/useDeleteCategory';
 import { Category } from '@/features/categories/types';
 
+// Memo component cho CategoryRow để tránh re-render không cần thiết
+const CategoryTableRow = memo(({ 
+  category, 
+  formatDate, 
+  onEditClick, 
+  onDeleteClick 
+}: { 
+  category: Category, 
+  formatDate: (date: string | null) => string,
+  onEditClick: (category: Category) => void, 
+  onDeleteClick: (category: Category) => void 
+}) => {
+  return (
+    <TableRow key={category.id}>
+      <TableCell>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-muted">
+            {category.image ? (
+              <img
+                src={category.image}
+                alt={category.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="text-sm font-medium">
+                {category.name.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div>
+            <p className="font-medium">{category.name}</p>
+            <p className="text-xs text-muted-foreground">#{category.id}</p>
+          </div>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-start gap-1">
+          <FileText className="mt-0.5 h-3 w-3 flex-shrink-0 text-muted-foreground" />
+          <span className="max-w-[300px] truncate text-sm">
+            {category.description || "No description available."}
+          </span>
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-1">
+          <Calendar className="h-3 w-3 text-muted-foreground" />
+          <span className="text-sm">{formatDate(category.createdAt)}</span>
+        </div>
+      </TableCell>
+      <TableCell>
+        <span className="text-sm">{category.createdBy}</span>
+      </TableCell>
+      <TableCell className="text-right">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0"
+            >
+              <span className="sr-only">Open menu</span>
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEditClick(category)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Edit category
+            </DropdownMenuItem>
+            <DropdownMenuItem 
+              onClick={() => onDeleteClick(category)}
+              className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Delete category
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  );
+});
+
+CategoryTableRow.displayName = 'CategoryTableRow';
+
+// Memo component cho SortableHeader để tránh re-render không cần thiết
+const SortableHeader = memo(({ 
+  column, 
+  label, 
+  sortBy, 
+  sortOrder, 
+  onToggleSort 
+}: { 
+  column: string, 
+  label: string, 
+  sortBy: string | undefined, 
+  sortOrder: 'asc' | 'desc' | undefined, 
+  onToggleSort: (column: string) => void 
+}) => {
+  return (
+    <TableHead 
+      className="cursor-pointer hover:bg-muted/50"
+      onClick={() => onToggleSort(column)}
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        <ArrowUpDown size={14} className="ml-1" />
+        {sortBy === column && (
+          <span className="ml-1 text-xs">
+            ({sortOrder === 'asc' ? '↑' : '↓'})
+          </span>
+        )}
+      </div>
+    </TableHead>
+  );
+});
+
+SortableHeader.displayName = 'SortableHeader';
+
+// Memo component cho DeleteDialog
+const DeleteDialog = memo(({ 
+  isOpen, 
+  isDeleting, 
+  categoryName, 
+  onClose, 
+  onConfirm 
+}: { 
+  isOpen: boolean, 
+  isDeleting: boolean, 
+  categoryName: string | undefined, 
+  onClose: () => void, 
+  onConfirm: () => void 
+}) => {
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-destructive">
+            <AlertTriangle className="h-5 w-5" />
+            Confirm Deletion
+          </DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete category <strong>{categoryName}</strong>? This action cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose} disabled={isDeleting}>
+            Cancel
+          </Button>
+          <Button 
+            variant="destructive" 
+            onClick={onConfirm}
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              'Delete'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+});
+
+DeleteDialog.displayName = 'DeleteDialog';
+
+// Memo component cho PaginationControls
+const PaginationControls = memo(({ 
+  currentPage, 
+  totalPages, 
+  totalItems, 
+  pageSize, 
+  onPageChange 
+}: { 
+  currentPage: number, 
+  totalPages: number, 
+  totalItems: number, 
+  pageSize: number, 
+  onPageChange: (page: number) => void 
+}) => {
+  return (
+    <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+      <div>
+        Showing {(currentPage - 1) * pageSize + 1}-{Math.min(currentPage * pageSize, totalItems)} of {totalItems} categories
+      </div>
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => onPageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          <ChevronLeft size={16} />
+        </Button>
+        {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+          let pageNumber;
+          if (totalPages <= 5) {
+            pageNumber = i + 1;
+          } else if (currentPage <= 3) {
+            pageNumber = i + 1;
+          } else if (currentPage >= totalPages - 2) {
+            pageNumber = totalPages - 4 + i;
+          } else {
+            pageNumber = currentPage - 2 + i;
+          }
+
+          return (
+            <Button
+              key={pageNumber}
+              variant={currentPage === pageNumber ? "default" : "outline"}
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onPageChange(pageNumber)}
+            >
+              {pageNumber}
+            </Button>
+          );
+        })}
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-8 w-8"
+          onClick={() => onPageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+        >
+          <ChevronRight size={16} />
+        </Button>
+      </div>
+    </div>
+  );
+});
+
+PaginationControls.displayName = 'PaginationControls';
+
 const CategoryPage = () => {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
@@ -53,33 +293,43 @@ const CategoryPage = () => {
     }
   });
 
-  // Handle edit button click
-  const handleEditClick = (category: Category) => {
+  // Handle edit button click - memoize callback
+  const handleEditClick = useCallback((category: Category) => {
     setSelectedCategory(category);
     setIsFormDialogOpen(true);
-  };
+  }, []);
 
-  // Handle delete button click
-  const handleDeleteClick = (category: Category) => {
+  // Handle delete button click - memoize callback
+  const handleDeleteClick = useCallback((category: Category) => {
     setSelectedCategory(category);
     setIsDeleteDialogOpen(true);
-  };
+  }, []);
 
-  // Handle add new button click
-  const handleAddNewClick = () => {
+  // Handle add new button click - memoize callback
+  const handleAddNewClick = useCallback(() => {
     setSelectedCategory(null);
     setIsFormDialogOpen(true);
-  };
+  }, []);
 
-  // Handle delete confirmation
-  const handleConfirmDelete = () => {
+  // Handle delete confirmation - memoize callback
+  const handleConfirmDelete = useCallback(() => {
     if (selectedCategory) {
       deleteCategory(selectedCategory.id);
     }
-  };
+  }, [deleteCategory, selectedCategory]);
 
-  // Format date
-  const formatDate = (dateString: string | null) => {
+  // Handle dialog close - memoize callback
+  const handleFormDialogClose = useCallback(() => {
+    setIsFormDialogOpen(false);
+  }, []);
+
+  // Handle delete dialog close - memoize callback
+  const handleDeleteDialogClose = useCallback(() => {
+    setIsDeleteDialogOpen(false);
+  }, []);
+
+  // Format date - memoize callback
+  const formatDate = useCallback((dateString: string | null) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -87,34 +337,29 @@ const CategoryPage = () => {
       month: '2-digit',
       day: '2-digit',
     }).format(date);
-  };
+  }, []);
 
-  // Toggle sort direction
-  const toggleSort = (column: string) => {
+  // Toggle sort direction - memoize callback
+  const toggleSort = useCallback((column: string) => {
     const direction = 
       filters.sortBy === column && filters.sortOrder === 'asc' 
         ? 'desc' 
         : 'asc';
     handleSortChange(column, direction);
-  };
+  }, [filters.sortBy, filters.sortOrder, handleSortChange]);
 
-  // Render sortable header
-  const renderSortableHeader = (column: string, label: string) => (
-    <TableHead 
-      className="cursor-pointer hover:bg-muted/50"
-      onClick={() => toggleSort(column)}
-    >
-      <div className="flex items-center gap-1">
-        {label}
-        <ArrowUpDown size={14} className="ml-1" />
-        {filters.sortBy === column && (
-          <span className="ml-1 text-xs">
-            ({filters.sortOrder === 'asc' ? '↑' : '↓'})
-          </span>
-        )}
-      </div>
-    </TableHead>
-  );
+  // Memoize các hàng của table để tránh re-render không cần thiết
+  const categoryRows = useMemo(() => {
+    return categories.map((category) => (
+      <CategoryTableRow
+        key={category.id}
+        category={category}
+        formatDate={formatDate}
+        onEditClick={handleEditClick}
+        onDeleteClick={handleDeleteClick}
+      />
+    ));
+  }, [categories, formatDate, handleEditClick, handleDeleteClick]);
 
   return (
     <motion.div 
@@ -143,10 +388,34 @@ const CategoryPage = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              {renderSortableHeader("name", "Category")}
-              {renderSortableHeader("description", "Description")}
-              {renderSortableHeader("createdAt", "Created")}
-              {renderSortableHeader("createdBy", "Created By")}
+              <SortableHeader 
+                column="name" 
+                label="Category" 
+                sortBy={filters.sortBy} 
+                sortOrder={filters.sortOrder} 
+                onToggleSort={toggleSort} 
+              />
+              <SortableHeader 
+                column="description" 
+                label="Description" 
+                sortBy={filters.sortBy} 
+                sortOrder={filters.sortOrder} 
+                onToggleSort={toggleSort} 
+              />
+              <SortableHeader 
+                column="createdAt" 
+                label="Created" 
+                sortBy={filters.sortBy} 
+                sortOrder={filters.sortOrder} 
+                onToggleSort={toggleSort} 
+              />
+              <SortableHeader 
+                column="createdBy" 
+                label="Created By" 
+                sortBy={filters.sortBy} 
+                sortOrder={filters.sortOrder} 
+                onToggleSort={toggleSort} 
+              />
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -164,75 +433,7 @@ const CategoryPage = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              categories.map((category: Category) => (
-                <TableRow key={category.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-muted">
-                        {category.image ? (
-                          <img
-                            src={category.image}
-                            alt={category.name}
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <span className="text-sm font-medium">
-                            {category.name.charAt(0).toUpperCase()}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <p className="font-medium">{category.name}</p>
-                        <p className="text-xs text-muted-foreground">#{category.id}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-start gap-1">
-                      <FileText className="mt-0.5 h-3 w-3 flex-shrink-0 text-muted-foreground" />
-                      <span className="max-w-[300px] truncate text-sm">
-                        {category.description || "No description available."}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3 text-muted-foreground" />
-                      <span className="text-sm">{formatDate(category.createdAt)}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">{category.createdBy}</span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 w-8 p-0"
-                        >
-                          <span className="sr-only">Open menu</span>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEditClick(category)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Edit category
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => handleDeleteClick(category)}
-                          className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete category
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
+              categoryRows
             )}
           </TableBody>
         </Table>
@@ -240,113 +441,30 @@ const CategoryPage = () => {
       
       {/* Pagination */}
       {meta && meta.total > 0 && (
-        <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
-          <div>
-            Showing {(meta.page - 1) * meta.pageSize + 1}-{Math.min(meta.page * meta.pageSize, meta.total)} of {meta.total} categories
-          </div>
-          <div className="flex items-center gap-1">
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => handlePageChange(meta.page - 1)}
-              disabled={meta.page === 1}
-            >
-              <ChevronLeft size={16} />
-            </Button>
-            {Array.from({ length: Math.min(meta.pages, 5) }, (_, i) => {
-              let pageNumber;
-              if (meta.pages <= 5) {
-                pageNumber = i + 1;
-              } else if (meta.page <= 3) {
-                pageNumber = i + 1;
-              } else if (meta.page >= meta.pages - 2) {
-                pageNumber = meta.pages - 4 + i;
-              } else {
-                pageNumber = meta.page - 2 + i;
-              }
-
-              return (
-                <Button
-                  key={pageNumber}
-                  variant={meta.page === pageNumber ? "default" : "outline"}
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => handlePageChange(pageNumber)}
-                >
-                  {pageNumber}
-                </Button>
-              );
-            })}
-            <Button
-              variant="outline"
-              size="icon"
-              className="h-8 w-8"
-              onClick={() => handlePageChange(meta.page + 1)}
-              disabled={meta.page === meta.pages}
-            >
-              <ChevronRight size={16} />
-            </Button>
-          </div>
-        </div>
+        <PaginationControls
+          currentPage={meta.page}
+          totalPages={meta.pages}
+          totalItems={meta.total}
+          pageSize={meta.pageSize}
+          onPageChange={handlePageChange}
+        />
       )}
       
-      {/* Category form dialog */}
+      {/* Category Form Dialog */}
       <CategoryDialog
         isOpen={isFormDialogOpen}
+        onOpenChange={handleFormDialogClose}
         category={selectedCategory}
-        onOpenChange={setIsFormDialogOpen}
-        onSuccess={() => setIsFormDialogOpen(false)}
       />
       
-      {/* Delete confirmation dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-destructive">
-              <Trash2 className="h-5 w-5" />
-              Delete Category
-            </DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this category? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-
-          {selectedCategory && (
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-4 rounded-md border p-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
-                  <AlertTriangle className="h-5 w-5" />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">{selectedCategory.name}</p>
-                  <p className="text-sm text-muted-foreground">ID: {selectedCategory.id}</p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isDeleting}>
-              Cancel
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleConfirmDelete}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Deleting...
-                </>
-              ) : (
-                "Delete Category"
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Delete Confirmation Dialog */}
+      <DeleteDialog
+        isOpen={isDeleteDialogOpen}
+        isDeleting={isDeleting}
+        categoryName={selectedCategory?.name}
+        onClose={handleDeleteDialogClose}
+        onConfirm={handleConfirmDelete}
+      />
     </motion.div>
   );
 };

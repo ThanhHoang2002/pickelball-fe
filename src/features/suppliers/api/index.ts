@@ -19,7 +19,7 @@ export const getAllSuppliers = async (
   const response = await axiosClient.get<ApiResponse<SupplierResponse>>("/suppliers", {
     params: {
       page: params.page || 1,
-      pageSize: params.pageSize || 10,
+      size: params.size || 10,
       filter: filter.toString() === "()" ? undefined : filter.toString(),
       sortBy: params.sortBy,
       sortDirection: params.sortDirection,

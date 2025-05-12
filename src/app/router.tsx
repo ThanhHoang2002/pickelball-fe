@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import CheckoutPage from './pages/client/CheckoutPage';
+import ProfilePage from './pages/client/ProfilePage';
 
 import { CategoryPage } from '@/app/pages/client/CategoryPage';
 import { ProductDetailsPage } from '@/app/pages/client/ProductDetailsPage';
@@ -21,6 +22,8 @@ const OrderPage = lazy(() => import('@/app/pages/admin/OrderPage'));
 const CustomerPage = lazy(() => import('@/app/pages/admin/CustomerPage'));
 const Supplier = lazy(() => import('@/app/pages/admin/SupplierPage'));
 const AdminCategoryPage = lazy(() => import('@/app/pages/admin/CategoryPage'));
+const OrderConfirmation = lazy(() => import('@/features/checkout/components/OrderConfirmation'));
+const MyOrdersPage = lazy(() => import('@/app/pages/client/MyOrdersPage'));
 const router = createBrowserRouter([
   {
     path: '/',
@@ -55,8 +58,20 @@ const router = createBrowserRouter([
             element: <CartPage />,
           },
           {
+            path: 'profile',
+            element: <ProfilePage />,
+          },
+          {
             path: 'checkout/*',
             element: <CheckoutPage />,
+          },
+          {
+            path: 'confirmation/:orderId',
+            element: <OrderConfirmation />,
+          },
+          {
+            path: 'my-orders',
+            element: <MyOrdersPage />,
           },
         ],
       }
