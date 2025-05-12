@@ -1,5 +1,7 @@
 import { Loader2 } from "lucide-react";
 
+import { useDeleteCategory } from "../hooks/useDeleteCategory";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -10,7 +12,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useDeleteCategory } from "../hooks/useDeleteCategory";
 
 interface DeleteCategoryDialogProps {
   isOpen: boolean;

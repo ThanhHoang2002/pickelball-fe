@@ -1,3 +1,6 @@
+import { Category } from "../types";
+import { CategoryForm } from "./CategoryForm";
+
 import {
   Dialog,
   DialogContent,
@@ -5,8 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Category } from "../types";
-import { CategoryForm } from "./CategoryForm";
 
 interface CategoryDialogProps {
   isOpen: boolean;

@@ -67,9 +67,9 @@ const ProductDialog = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Fetch suppliers using the hook
-  const { data: suppliersData, isLoading: isSuppliersLoading } = useSuppliers();
+  const { suppliers: suppliersData, loading: isSuppliersLoading } = useSuppliers();
   // Extract suppliers from the response or use empty array as fallback
-  const suppliers: Supplier[] = suppliersData?.result || [];
+  const suppliers: Supplier[] = suppliersData || [];
 
   // Fetch categories using the hook
   const { categories, isLoading: isCategoriesLoading } = useCategories();

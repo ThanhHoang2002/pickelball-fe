@@ -1,7 +1,7 @@
 import { Clock, CreditCard, MapPin, Package, Phone, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 
-import { Order, PaymentStatus } from "../types";
+import { Order, OrderStatus, PaymentStatus } from "../types";
 import { OrderStatusBadge } from "./OrderStatusBadge";
 import { PaymentMethodBadge } from "./PaymentMethodBadge";
 
@@ -20,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { formatCurrency } from "@/utils/format";
 
 interface CardProps {
   children: React.ReactNode;
@@ -70,6 +71,7 @@ interface OrderDialogProps {
   onClose: () => void;
   order: Order | null;
   onUpdatePaymentStatus?: (id: number, status: PaymentStatus) => Promise<Order | null>;
+  onUpdateOrderStatus?: (id: number, status: OrderStatus) => Promise<Order | null>;
   loading?: boolean;
 }
 
@@ -78,9 +80,11 @@ export const OrderDialog = ({
   onClose, 
   order, 
   onUpdatePaymentStatus,
+  onUpdateOrderStatus,
   loading = false 
 }: OrderDialogProps) => {
   const [newPaymentStatus, setNewPaymentStatus] = useState<PaymentStatus | "">("");
+  const [newOrderStatus, setNewOrderStatus] = useState<OrderStatus | "">("");
 
   // Format date to readable format
   const formatDate = (dateString: string) => {
@@ -95,20 +99,19 @@ export const OrderDialog = ({
     }).format(date);
   };
 
-  // Format currency
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
+ 
 
   const handleUpdatePaymentStatus = async () => {
     if (onUpdatePaymentStatus && newPaymentStatus && order) {
       await onUpdatePaymentStatus(order.id, newPaymentStatus as PaymentStatus);
       setNewPaymentStatus("");
+    }
+  };
+
+  const handleUpdateOrderStatus = async () => {
+    if (onUpdateOrderStatus && newOrderStatus && order) {
+      await onUpdateOrderStatus(order.id, newOrderStatus as OrderStatus);
+      setNewOrderStatus("");
     }
   };
 
@@ -124,6 +127,7 @@ export const OrderDialog = ({
           </DialogTitle>
           <div className="flex flex-wrap gap-2 pt-2">
             <OrderStatusBadge status={order.paymentStatus} type="payment" />
+            <OrderStatusBadge status={order.orderStatus} type="order" />
           </div>
         </DialogHeader>
 
@@ -148,9 +152,13 @@ export const OrderDialog = ({
                     <div className="text-sm text-muted-foreground">Payment Method</div>
                     <div><PaymentMethodBadge method={order.paymentMethod} /></div>
                   </div>
-                  <div className="col-span-2">
+                  <div>
                     <div className="text-sm text-muted-foreground">Payment Status</div>
                     <div><OrderStatusBadge status={order.paymentStatus} type="payment" /></div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-muted-foreground">Order Status</div>
+                    <div><OrderStatusBadge status={order.orderStatus} type="order" /></div>
                   </div>
                   {order.transactionNo && (
                     <div className="col-span-2">
@@ -183,12 +191,12 @@ export const OrderDialog = ({
                     <thead className="bg-muted/50 text-xs font-medium text-muted-foreground">
                       <tr>
                         <th className="px-4 py-2.5 text-left">Product</th>
-                        <th className="w-20 px-4 py-2.5 text-center">Qty</th>
+                        <th className="w-20 px-4 py-2.5 text-center">Quantity</th>
                         <th className="w-28 px-4 py-2.5 text-right">Subtotal</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {order.items && order.items.map((item) => (
+                      {order.orderDetails && order.orderDetails.map((item) => (
                         <tr key={item.id} className="hover:bg-muted/30">
                           <td className="px-4 py-2.5">
                             <div className="flex items-center gap-2">
@@ -222,42 +230,73 @@ export const OrderDialog = ({
               </CardContent>
             </Card>
 
-            {/* Payment Status Updates */}
-            {onUpdatePaymentStatus && (
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <Clock className="h-4 w-4" />
-                    Update Payment Status
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-medium">Payment Status</h4>
-                    <div className="flex items-center gap-2">
-                      <Select value={newPaymentStatus} onValueChange={(value) => setNewPaymentStatus(value as PaymentStatus)}>
-                        <SelectTrigger className="flex-1">
-                          <SelectValue placeholder="Select status" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="PENDING">Pending</SelectItem>
-                          <SelectItem value="PAID">Paid</SelectItem>
-                          <SelectItem value="FAILED">Failed</SelectItem>
-                          <SelectItem value="REFUNDED">Refunded</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Button 
-                        disabled={!newPaymentStatus || loading} 
-                        onClick={handleUpdatePaymentStatus}
-                        size="sm"
-                      >
-                        Update
-                      </Button>
+            {/* Status Updates */}
+            {(onUpdatePaymentStatus || onUpdateOrderStatus) && <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Clock className="h-4 w-4" />
+                  Update Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {/* Payment Status Updates */}
+                  {onUpdatePaymentStatus && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium">Payment Status</h4>
+                      <div className="flex items-center gap-2">
+                        <Select value={newPaymentStatus} onValueChange={(value) => setNewPaymentStatus(value as PaymentStatus)}>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Select payment status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="PAID">Paid</SelectItem>
+                            <SelectItem value="FAILED">Failed</SelectItem>
+                            <SelectItem value="REFUNDED">Refunded</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button 
+                          disabled={!newPaymentStatus || loading} 
+                          onClick={handleUpdatePaymentStatus}
+                          size="sm"
+                        >
+                          Update
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+                  )}
+
+                  
+                  {onUpdateOrderStatus && (
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-medium">Order Status</h4>
+                      <div className="flex items-center gap-2">
+                        <Select value={newOrderStatus} onValueChange={(value) => setNewOrderStatus(value as OrderStatus)}>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Select order status" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="PENDING">Pending</SelectItem>
+                            <SelectItem value="PROCESSING">Processing</SelectItem>
+                            <SelectItem value="SHIPPED">Shipped</SelectItem>
+                            <SelectItem value="DELIVERED">Delivered</SelectItem>
+                            <SelectItem value="CANCELLED">Cancelled</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Button 
+                          disabled={!newOrderStatus || loading} 
+                          onClick={handleUpdateOrderStatus}
+                          size="sm"
+                        >
+                          Update
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>}
           </div>
 
           {/* Right Column */}
@@ -348,6 +387,33 @@ export const OrderDialog = ({
                       </div>
                     </div>
                   )}
+
+                  {/* Show order status in timeline */}
+                  <div className="flex gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className={`flex h-6 w-6 items-center justify-center rounded-full text-white ${
+                        order.orderStatus === 'CANCELLED'
+                          ? 'bg-red-500'
+                          : order.orderStatus === 'DELIVERED'
+                            ? 'bg-green-500'
+                            : order.orderStatus === 'SHIPPED'
+                              ? 'bg-indigo-500'
+                              : 'bg-blue-500'
+                      }`}>
+                        <Package className="h-3 w-3" />
+                      </div>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">
+                        {order.orderStatus === 'PENDING' ? 'Order Received' :
+                        order.orderStatus === 'PROCESSING' ? 'Order Processing' :
+                        order.orderStatus === 'SHIPPED' ? 'Order Shipped' :
+                        order.orderStatus === 'DELIVERED' ? 'Order Delivered' :
+                        order.orderStatus === 'CANCELLED' ? 'Order Cancelled' : 'Order Status Updated'}
+                      </p>
+                      <p className="text-xs text-gray-500">{formatDate(order.updatedAt)}</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

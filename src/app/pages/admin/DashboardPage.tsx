@@ -4,7 +4,6 @@ import { memo, useMemo } from 'react';
 
 import {
   StatCard,
-  SalesChart,
   TopProducts,
   RecentOrders,
   PeriodFilter
@@ -15,26 +14,24 @@ import { formatCurrency } from '@/utils/format';
 // Function để map period filter sang label hiển thị
 const getPeriodLabel = (period: string): string => {
   const periodMap: Record<string, string> = {
-    today: 'Today',
-    last7days: 'Last 7 days',
-    last30days: 'Last 30 days',
-    last12months: 'Last 12 months',
-    alltime: 'All time',
+    today: 'Day',
+    week: 'Week',
+    month: 'Month',
+    year: 'Year',
   };
-  return periodMap[period] || 'Last 30 days';
+  return periodMap[period] || 'Month';
 };
 
 const DashboardPage = () => {
   // Sử dụng custom hook để lấy dữ liệu
   const {
     stats,
-    salesData,
     topProducts,
     recentOrders,
     period,
     handlePeriodChange,
     isLoading,
-  } = useDashboard('last30days');
+  } = useDashboard('month');
 
   // Memoize period label để tránh tính toán lại không cần thiết
   const periodLabel = useMemo(() => getPeriodLabel(period), [period]);
@@ -71,37 +68,40 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard
           title="Total Revenue"
-          value={formatCurrency(stats.totalRevenue)}
+          value={formatCurrency(stats.revenue.currentValue)}
+          previousValue={formatCurrency(stats.revenue.previousValue)}
           icon={DollarSign}
-          growthRate={stats.revenueGrowth}
+          growthRate={stats.revenue.growthRate}
           progressPercentage={progressPercentages.revenue}
         />
         <StatCard
           title="Total Orders"
-          value={stats.totalOrders}
+          value={stats.orders.currentValue}
+          previousValue={stats.orders.previousValue}
           icon={ShoppingBasket}
-          growthRate={stats.ordersGrowth}
+          growthRate={stats.orders.growthRate}
           progressPercentage={progressPercentages.orders}
         />
         <StatCard
           title="Products Sold"
-          value={stats.productsSold}
+          value={stats.productsSold.currentValue}
+          previousValue={stats.productsSold.previousValue}
           icon={CakeSlice}
-          growthRate={stats.productsGrowth}
+          growthRate={stats.productsSold.growthRate}
           progressPercentage={progressPercentages.products}
         />
         <StatCard
           title="New Customers"
-          value={stats.newCustomers}
+          value={stats.customers.currentValue}
+          previousValue={stats.customers.previousValue}
           icon={Users}
-          growthRate={stats.customersGrowth}
+          growthRate={stats.customers.growthRate}
           progressPercentage={progressPercentages.customers}
         />
       </div>
 
       {/* Charts */}
-      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <SalesChart data={salesData} period={periodLabel} />
+      <div className="mt-8">
         <TopProducts products={topProducts} />
       </div>
 

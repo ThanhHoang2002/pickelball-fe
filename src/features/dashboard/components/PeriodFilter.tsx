@@ -1,5 +1,5 @@
-import { memo, useState } from 'react';
 import { Filter } from 'lucide-react';
+import { memo, useState } from 'react';
 
 import { PeriodFilter as PeriodFilterType } from '../types';
 
@@ -9,11 +9,10 @@ interface PeriodFilterProps {
 }
 
 const periodOptions: { label: string; value: PeriodFilterType }[] = [
-  { label: 'Today', value: 'today' },
-  { label: 'Last 7 days', value: 'last7days' },
-  { label: 'Last 30 days', value: 'last30days' },
-  { label: 'Last 12 months', value: 'last12months' },
-  { label: 'All time', value: 'alltime' },
+  { label: 'Day', value: 'today' },
+  { label: 'Week', value: 'week' },
+  { label: 'Month', value: 'month' },
+  { label: 'Year', value: 'year' },
 ];
 
 const PeriodFilter = memo(({ selectedPeriod, onPeriodChange }: PeriodFilterProps) => {

@@ -7,7 +7,7 @@ export const updatePaymentStatus = async (
   id: number,
   paymentStatus: PaymentStatus
 ): Promise<Order> => {
-  const response = await axiosClient.post<ApiResponse<Order>>(
+  const response = await axiosClient.put<ApiResponse<Order>>(
     `/orders/${id}/update-payment-status`,
     { paymentStatus }
   );

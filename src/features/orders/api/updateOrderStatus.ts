@@ -5,11 +5,11 @@ import { ApiResponse } from "@/types/apiResponse";
 
 export const updateOrderStatus = async (
   id: number,
-  status: OrderStatus
+  orderStatus: OrderStatus
 ): Promise<Order> => {
-  const response = await axiosClient.patch<ApiResponse<Order>>(
-    `/orders/${id}/status`,
-    { status }
+  const response = await axiosClient.put<ApiResponse<Order>>(
+    `/orders/${id}/update-order-status`,
+    { orderStatus }
   );
   return response.data.data;
 }; 

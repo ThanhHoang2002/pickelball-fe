@@ -26,6 +26,7 @@ import ProductDialog from '@/features/products/components/ProductDialog';
 import SortableHeader from '@/features/products/components/SortableHeader';
 import { useAdminProducts } from '@/features/products/hooks/useAdminProducts';
 import { useToast } from '@/hooks/use-toast';
+import { formatCurrency } from '@/utils/format';
 
 const ProductPage = () => {
   const {
@@ -63,14 +64,6 @@ const ProductPage = () => {
   const [searchInput, setSearchInput] = useState(filters.search);
   const { toast } = useToast();
   const [deleteError, setDeleteError] = useState<string | null>(null);
-
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-    }).format(value);
-  };
 
   // Handle search input submit
   const handleSearchSubmit = (e: React.FormEvent) => {

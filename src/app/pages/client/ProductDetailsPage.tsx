@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 
+import { useCart } from '@/features/cart';
 import { ProductDetails } from '@/features/products/components/ProductDetails';
 import { ProductGrid } from '@/features/products/components/ProductGrid';
 import { useProductById, useProductsByCategory } from '@/features/products/hooks/useProducts';
@@ -7,7 +8,7 @@ import { mappingCategoryName } from '@/utils/mappingCategoryName';
 
 export const ProductDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
-  
+  const {addItem} =useCart()
   // Fetch product data
   const { 
     data: product, 
@@ -86,6 +87,7 @@ export const ProductDetailsPage = () => {
           <ProductGrid
             products={relatedProducts}
             title="Related products"
+            addItem={addItem}
           />
         </div>
       )}

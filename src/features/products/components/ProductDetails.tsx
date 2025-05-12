@@ -1,5 +1,8 @@
 import { motion } from 'framer-motion';
 import { useState, useRef } from 'react';
+import type { DetailedHTMLProps, HTMLAttributes, OlHTMLAttributes, LiHTMLAttributes, AnchorHTMLAttributes, QuoteHTMLAttributes } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
 
 import { Product } from '../types';
 
@@ -7,6 +10,43 @@ import { useCart } from '@/features/cart/hooks/useCart';
 
 type ProductDetailsProps = {
   product: Product;
+};
+
+// Custom components for markdown rendering
+const markdownComponents = {
+  p: (props: DetailedHTMLProps<HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>) => (
+    <p className="mb-4" {...props} />
+  ),
+  h1: (props: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
+    <h1 className="mb-4 text-2xl font-bold" {...props} />
+  ),
+  h2: (props: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
+    <h2 className="mb-3 text-xl font-bold" {...props} />
+  ),
+  h3: (props: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
+    <h3 className="mb-2 text-lg font-bold" {...props} />
+  ),
+  ul: (props: DetailedHTMLProps<HTMLAttributes<HTMLUListElement>, HTMLUListElement>) => (
+    <ul className="mb-4 list-disc pl-5" {...props} />
+  ),
+  ol: (props: DetailedHTMLProps<OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>) => (
+    <ol className="mb-4 list-decimal pl-5" {...props} />
+  ),
+  li: (props: DetailedHTMLProps<LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>) => (
+    <li className="mb-1" {...props} />
+  ),
+  a: (props: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>) => (
+    <a className="text-blue-600 hover:underline" {...props} />
+  ),
+  blockquote: (props: DetailedHTMLProps<QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>) => (
+    <blockquote className="border-l-4 border-gray-200 pl-4 italic" {...props} />
+  ),
+  code: (props: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>) => (
+    <code className="rounded bg-gray-100 px-1 py-0.5 font-mono text-sm" {...props} />
+  ),
+  pre: (props: DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTMLPreElement>) => (
+    <pre className="mb-4 overflow-x-auto rounded bg-gray-100 p-4 font-mono text-sm" {...props} />
+  ),
 };
 
 export const ProductDetails = ({ product }: ProductDetailsProps) => {
@@ -24,12 +64,6 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
   const handleAddToCart = () => {
     addItem(product?.id, quantity);
   };
-
-  const formattedDescription = product?.description
-    .split('|')
-    .map(paragraph => paragraph.trim())
-    .filter(Boolean)
-    .join('\n\n');
 
   const toggleDescription = () => {
     setIsDescriptionExpanded(!isDescriptionExpanded);
@@ -76,15 +110,22 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
 
         <div 
           ref={descriptionRef} 
-          className={`mt-6 text-gray-700 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}
+          id="product-description"
+          className={`mt-6 max-w-none text-gray-700 ${!isDescriptionExpanded ? 'line-clamp-3' : ''}`}
         >
-          {formattedDescription}
+          {product?.description && (
+            <ReactMarkdown remarkPlugins={[remarkBreaks]} components={markdownComponents}>
+              {product.description}
+            </ReactMarkdown>
+          )}
         </div>
         
-        {formattedDescription && formattedDescription.length > 0 && (
+        {product?.description && (
           <button 
             onClick={toggleDescription}
             className="mt-1 text-left text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline focus:outline-none"
+            aria-expanded={isDescriptionExpanded}
+            aria-controls="product-description"
           >
             {isDescriptionExpanded ? 'Collapse' : 'Read more ...'}
           </button>
@@ -98,6 +139,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
               onClick={() => handleQuantityChange(quantity - 1)}
               className="rounded-l-md border border-r-0 border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 hover:bg-gray-100"
               disabled={quantity <= 1}
+              aria-label="Decrease quantity"
             >
               -
             </button>
@@ -106,6 +148,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
               onClick={() => handleQuantityChange(quantity + 1)}
               className="rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-gray-900 hover:bg-gray-100"
               disabled={quantity >= product?.quantity}
+              aria-label="Increase quantity"
             >
               +
             </button>
@@ -119,6 +162,7 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           disabled={product?.quantity <= 0}
+          aria-label={product?.quantity > 0 ? 'Add to cart' : 'Out of stock'}
         >
           {product?.quantity > 0 ? 'Add to cart' : 'Out of stock'}
         </motion.button>

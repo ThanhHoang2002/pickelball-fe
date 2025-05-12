@@ -1,6 +1,6 @@
 export type PaymentMethod = 'COD' | 'TRANSFER' | 'CREDIT_CARD';
 export type PaymentStatus = 'PENDING' | 'PAID' | 'FAILED' | 'REFUNDED';
-export type OrderStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'DELIVERED' | 'CANCELLED';
+export type OrderStatus = 'PENDING' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
 
 export interface User {
   id: number;
@@ -21,6 +21,7 @@ export interface Order {
   totalPrice: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
+  orderStatus: OrderStatus;
   paymentUrl: string | null;
   transactionNo: string | null;
   paymentMessage: string;
@@ -31,7 +32,7 @@ export interface Order {
   user: User;
   phone: string;
   address: string;
-  items?: OrderItem[];
+  orderDetails?: OrderItem[];
 }
 
 export interface OrderItem {
@@ -60,6 +61,7 @@ export interface OrderFilterParams {
   size?: number;
   search?: string;
   paymentStatus?: PaymentStatus;
+  orderStatus?: OrderStatus;
   paymentMethod?: PaymentMethod;
   sortBy?: string;
   sortDirection?: 'asc' | 'desc';

@@ -88,7 +88,7 @@ export const useChatQuery = () => {
       // Trả về context để sử dụng trong onError
       return { previousMessages };
     },
-    onError: (err, newChat, context) => {
+    onError: (err, _newChat, context) => {
       // Rollback nếu mutation fail
       if (context?.previousMessages && threadId) {
         queryClient.setQueryData(['chatHistory', threadId], context.previousMessages);

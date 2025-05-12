@@ -1,10 +1,11 @@
+import { CakeSlice } from 'lucide-react';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { CakeSlice } from 'lucide-react';
+
+import { TopSellingProduct } from '../types';
 
 import { Card } from '@/components/ui/card';
 import { formatCurrency } from '@/utils/format';
-import { TopSellingProduct } from '../types';
 
 interface TopProductsProps {
   products: TopSellingProduct[];
@@ -23,12 +24,12 @@ const TopProducts = memo(({ products }: TopProductsProps) => {
         {products.length > 0 ? (
           <ul className="space-y-4">
             {products.map((product) => (
-              <li key={product.id} className="flex items-center">
+              <li key={product.productId} className="flex items-center">
                 <div className="mr-4 h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-muted">
-                  {product.imageSrc ? (
+                  {product.productImage ? (
                     <img
-                      src={product.imageSrc}
-                      alt={product.name}
+                      src={product.productImage}
+                      alt={product.productName}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -38,15 +39,15 @@ const TopProducts = memo(({ products }: TopProductsProps) => {
                   )}
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-medium">{product.name}</h3>
+                  <h3 className="font-medium">{product.productName}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(product.price)}
+                    {formatCurrency(product.totalRevenue / product.totalQuantitySold)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="font-medium">{product.quantitySold} sold</p>
+                  <p className="font-medium">{product.totalQuantitySold} sold</p>
                   <p className="text-sm text-muted-foreground">
-                    {formatCurrency(product.revenue)}
+                    {formatCurrency(product.totalRevenue)}
                   </p>
                 </div>
               </li>

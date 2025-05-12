@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useState, useCallback, useEffect } from "react";
 
-import { getAllOrders, updatePaymentStatus } from "../api";
-import { OrderFilterParams, PaymentStatus } from "../types";
+import { getAllOrders, updatePaymentStatus, updateOrderStatus } from "../api";
+import { OrderFilterParams, OrderStatus, PaymentStatus } from "../types";
 
 import { useToast } from "@/hooks/use-toast";
 import { useDebounceSearch } from "@/hooks/useDebounce";
@@ -15,6 +15,7 @@ export const useOrders = (initialFilters: OrderFilterParams = {}) => {
     sortDirection: initialFilters.sortDirection || "desc",
     search: initialFilters.search || "",
     paymentStatus: initialFilters.paymentStatus,
+    orderStatus: initialFilters.orderStatus,
     paymentMethod: initialFilters.paymentMethod,
     fromDate: initialFilters.fromDate,
     toDate: initialFilters.toDate,
@@ -68,6 +69,27 @@ export const useOrders = (initialFilters: OrderFilterParams = {}) => {
     },
   });
 
+  // Mutation để cập nhật trạng thái đơn hàng
+  const updateOrderStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: OrderStatus }) => 
+      updateOrderStatus(id, status),
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Order status updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Could not update order status. Please try again later.",
+        variant: "destructive",
+      });
+      console.error("Error updating order status:", error);
+    },
+  });
+
   // Prefetch trang tiếp theo để cải thiện UX
   const prefetchNextPage = useCallback(() => {
     if (!data?.meta.pages || (filters.page || 1) >= data.meta.pages) return;
@@ -111,6 +133,11 @@ export const useOrders = (initialFilters: OrderFilterParams = {}) => {
     return updatePaymentStatusMutation.mutateAsync({ id, status });
   }, [updatePaymentStatusMutation]);
 
+  // Handle order status update với memoization
+  const handleUpdateOrderStatus = useCallback((id: number, status: OrderStatus) => {
+    return updateOrderStatusMutation.mutateAsync({ id, status });
+  }, [updateOrderStatusMutation]);
+
   // Prefetch data khi component mount hoặc filters thay đổi
   useEffect(() => {
     if (data && !isLoading && !isError && data.meta.pages > 1 && (filters.page || 1) < data.meta.pages) {
@@ -121,7 +148,7 @@ export const useOrders = (initialFilters: OrderFilterParams = {}) => {
   return {
     orders: data?.result || [],
     meta: data?.meta || { page: 1, pageSize: 10, pages: 0, total: 0 },
-    loading: isLoading || updatePaymentStatusMutation.isPending,
+    loading: isLoading || updatePaymentStatusMutation.isPending || updateOrderStatusMutation.isPending,
     isError,
     filters,
     searchTerm,
@@ -129,5 +156,6 @@ export const useOrders = (initialFilters: OrderFilterParams = {}) => {
     updateFilters,
     fetchOrders: refetch,
     updatePaymentStatus: handleUpdatePaymentStatus,
+    updateOrderStatus: handleUpdateOrderStatus,
   };
 }; 

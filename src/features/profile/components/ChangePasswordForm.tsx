@@ -19,13 +19,13 @@ import { Input } from '@/components/ui/input';
 
 // Định nghĩa schema validation
 const passwordSchema = z.object({
-  currentPassword: z.string().min(6, 'Current password must be at least 6 characters.'),
+  oldPassword: z.string().min(6, 'Current password must be at least 6 characters.'),
   newPassword: z.string().min(6, 'New password must be at least 6 characters.'),
   confirmPassword: z.string().min(6, 'Confirm password must be at least 6 characters.'),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
-}).refine((data) => data.currentPassword !== data.newPassword, {
+}).refine((data) => data.oldPassword !== data.newPassword, {
   message: "New password must be different from current password",
   path: ["newPassword"],
 });
@@ -39,7 +39,7 @@ export const ChangePasswordForm = () => {
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
     defaultValues: {
-      currentPassword: '',
+      oldPassword: '',
       newPassword: '',
       confirmPassword: '',
     },
@@ -61,14 +61,14 @@ export const ChangePasswordForm = () => {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="currentPassword"
+              name="oldPassword"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Current Password</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter your current password"
+                        placeholder="Enter your old password"
                       {...field}
                       disabled={isChangingPassword}
                     />

@@ -19,6 +19,7 @@ export const useCheckout = () => {
         });
         navigate(`/confirmation/${response.order.id}`);
       }else{
+        navigate(`/my-orders`);
         window.open(response.order.paymentUrl, '_blank');
       }
     },

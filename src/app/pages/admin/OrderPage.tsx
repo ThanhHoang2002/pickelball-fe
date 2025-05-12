@@ -14,7 +14,15 @@ const OrderPage = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false);
 
-  const { orders, meta, loading, filters, updateFilters, updatePaymentStatus } = useOrders({
+  const { 
+    orders, 
+    meta, 
+    loading, 
+    filters, 
+    updateFilters, 
+    updatePaymentStatus,
+    updateOrderStatus 
+  } = useOrders({
     page: 1,
     size: 10,
     sortBy: "createdAt",
@@ -81,6 +89,7 @@ const OrderPage = () => {
         onClose={handleCloseOrderDialog}
         order={selectedOrder}
         onUpdatePaymentStatus={updatePaymentStatus}
+        onUpdateOrderStatus={updateOrderStatus}
         loading={loading}
       />
     </motion.div>

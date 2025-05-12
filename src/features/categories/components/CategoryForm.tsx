@@ -1,11 +1,12 @@
 import { ImageIcon, Loader2 } from "lucide-react";
 
+import { CategoryFormValues, useCategoryForm } from "../hooks/useCategoryForm";
+import { Category } from "../types";
+
 import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import Image from "@/components/ui/image";
 import { Textarea } from "@/components/ui/textarea";
-import { Category } from "../types";
-import { CategoryFormValues, useCategoryForm } from "../hooks/useCategoryForm";
 
 interface CategoryFormProps {
   category?: Category | null;

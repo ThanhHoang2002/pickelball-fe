@@ -1,7 +1,7 @@
 import { format } from "date-fns";
 import { Filter } from "lucide-react";
 
-import { OrderFilterParams, PaymentMethod, PaymentStatus } from "../types";
+import { OrderFilterParams, OrderStatus, PaymentMethod, PaymentStatus } from "../types";
 
 import {
   Select,
@@ -28,6 +28,10 @@ export const OrderFilterBar = ({
     onFilterChange({ paymentStatus: value === "all" ? undefined : value as PaymentStatus });
   };
 
+  const handleOrderStatusChange = (value: string) => {
+    onFilterChange({ orderStatus: value === "all" ? undefined : value as OrderStatus });
+  };
+
   const handlePaymentMethodChange = (value: string) => {
     onFilterChange({ paymentMethod: value === "all" ? undefined : value as PaymentMethod });
   };
@@ -35,6 +39,7 @@ export const OrderFilterBar = ({
   const getActiveFilterCount = () => {
     let count = 0;
     if (filters.paymentStatus) count++;
+    if (filters.orderStatus) count++;
     if (filters.paymentMethod) count++;
     if (filters.fromDate || filters.toDate) count++;
     return count;
@@ -96,6 +101,53 @@ export const OrderFilterBar = ({
               )}
             </div>
 
+            {/* Order Status Filter */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Order Status</label>
+              <Select 
+                value={filters.orderStatus || "all"} 
+                onValueChange={handleOrderStatusChange}
+              >
+                <SelectTrigger disabled={loading}>
+                  <SelectValue placeholder="All order statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All order statuses</SelectItem>
+                  <SelectItem value="PENDING">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-yellow-500"></span>
+                      Pending
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="PROCESSING">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-blue-500"></span>
+                      Processing
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="SHIPPED">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-indigo-500"></span>
+                      Shipped
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="DELIVERED">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                      Delivered
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              {filters.orderStatus && (
+                <div className="mt-1">
+                  <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-2 py-1 text-xs">
+                    Order: {filters.orderStatus}
+                  </span>
+                </div>
+              )}
+            </div>
+
             {/* Payment Method Filter */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Payment Method</label>
@@ -131,6 +183,11 @@ export const OrderFilterBar = ({
               {filters.paymentStatus && (
                 <span className="inline-flex items-center rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-800">
                   Payment: {filters.paymentStatus}
+                </span>
+              )}
+              {filters.orderStatus && (
+                <span className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
+                  Order: {filters.orderStatus}
                 </span>
               )}
               {filters.paymentMethod && (

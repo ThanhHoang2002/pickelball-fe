@@ -13,6 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/utils/format";
 
 interface OrdersTableProps {
   orders: Order[];
@@ -47,14 +48,6 @@ export const OrdersTable = ({
   };
 
   // Format currency in USD (dollars)
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  };
 
   return (
     <div className="rounded-md border">
@@ -67,13 +60,14 @@ export const OrdersTable = ({
             <TableHead >Total</TableHead>
             <TableHead>Payment Method</TableHead>
             <TableHead>Payment Status</TableHead>
+            <TableHead>Order Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {orders.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="h-24 text-center">
+              <TableCell colSpan={8} className="h-24 text-center">
                 {loading ? "Loading..." : "No orders found."}
               </TableCell>
             </TableRow>
@@ -96,6 +90,9 @@ export const OrdersTable = ({
                 </TableCell>
                 <TableCell>
                   <OrderStatusBadge status={order.paymentStatus} type="payment" />
+                </TableCell>
+                <TableCell>
+                  <OrderStatusBadge status={order.orderStatus} type="order" />
                 </TableCell>
                 <TableCell className="text-right">
                   <Button

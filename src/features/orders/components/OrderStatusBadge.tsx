@@ -29,13 +29,13 @@ export const OrderStatusBadge = ({
         statusText = "Processing";
         statusClass = "bg-blue-100 text-blue-800";
         break;
-      case "COMPLETED":
-        statusText = "Completed";
-        statusClass = "bg-green-100 text-green-800";
+      case "SHIPPED":
+        statusText = "Shipped";
+        statusClass = "bg-indigo-100 text-indigo-800";
         break;
       case "DELIVERED":
         statusText = "Delivered";
-        statusClass = "bg-indigo-100 text-indigo-800";
+        statusClass = "bg-green-100 text-green-800";
         break;
       case "CANCELLED":
         statusText = "Cancelled";

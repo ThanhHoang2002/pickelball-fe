@@ -1,7 +1,6 @@
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { ShoppingCart } from 'lucide-react';
-import { useState, forwardRef, useMemo } from 'react';
-import React from 'react';
+import { useState, forwardRef, useMemo, useContext, createContext, ReactNode, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Product } from '../types';
@@ -12,7 +11,7 @@ import { cn } from '@/utils/cn';
 type ProductCardRootProps = Omit<HTMLMotionProps<"div">, "onMouseEnter" | "onMouseLeave"> & {
   product: Product;
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 type ProductCardContextType = {
@@ -33,10 +32,10 @@ type ProductCardContextType = {
   };
 };
 
-const ProductCardContext = React.createContext<ProductCardContextType | undefined>(undefined);
+const ProductCardContext = createContext<ProductCardContextType | undefined>(undefined);
 
 const useProductCardContext = () => {
-  const context = React.useContext(ProductCardContext);
+  const context = useContext(ProductCardContext);
   if (!context) {
     throw new Error('ProductCard components must be used within ProductCard.Root');
   }
@@ -93,7 +92,7 @@ const Image = ({ className }: ImageProps) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   // Update image on hover
-  React.useEffect(() => {
+  useEffect(() => {
     if (hovered && formattedProduct.images.length > 1) {
       setCurrentImageIndex(1);
     } else {
@@ -197,7 +196,7 @@ Action.displayName = 'ProductCard.Action';
 // Content container
 type ContentProps = {
   className?: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 const Content = ({ className, children }: ContentProps) => {

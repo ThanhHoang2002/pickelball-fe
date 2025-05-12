@@ -5,15 +5,11 @@
  * @param currency Đơn vị tiền tệ mặc định là 'VND'
  * @returns Chuỗi đã được format theo định dạng tiền tệ
  */
-export const formatCurrency = (
-  amount: number,
-  locale = 'vi-VN',
-  currency = 'VND'
-): string => {
-  return new Intl.NumberFormat(locale, {
+export  const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
-}; 
+};

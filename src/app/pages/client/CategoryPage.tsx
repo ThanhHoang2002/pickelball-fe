@@ -29,7 +29,7 @@ const CATEGORY_DESCRIPTIONS: Record<string, string> = {
 export const CategoryPage = () => {
   const { category } = useParams<{ category: string }>();
   const { filters, updateFilters } = useProductsParams();
-  const { data: suppliersData } = useSuppliers();
+  const { suppliers: suppliersData } = useSuppliers();
   const {addItem} = useCart()
   // Lấy các tham số lọc từ URL
   const minPrice = filters.minPrice;
@@ -315,11 +315,11 @@ export const CategoryPage = () => {
               <h3 className="text-lg font-medium text-gray-900">Filters</h3>
               
               {/* Lọc theo nhà cung cấp */}
-              {suppliersData?.result?.length && suppliersData?.result?.length > 0 && (
+              {suppliersData?.length && suppliersData?.length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-sm font-medium text-gray-900">Supplier</h4>
                   <div className="mt-2 space-y-2">
-                    {suppliersData.result.map((supplier) => (
+                    {suppliersData.map((supplier) => (
                       <div key={String(supplier.id)} className="flex items-center">
                         <input
                           id={`supplier-${supplier.id}`}
