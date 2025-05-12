@@ -108,6 +108,10 @@ const router = createBrowserRouter([
       {
         path: 'suppliers',
         element: <Supplier />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       }
     ],
   },

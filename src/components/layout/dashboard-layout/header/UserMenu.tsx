@@ -35,7 +35,7 @@ const UserMenu = () => {
           <div className="py-1">
             <Link
               className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
-              to="/profile"
+              to="/admin/profile"
             >
               <User className="h-4 w-4" /> Thông tin cá nhân
             </Link>
