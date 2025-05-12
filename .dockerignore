@@ -1,0 +1,45 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build output
+dist
+build
+
+# Version control
+.git
+.gitignore
+.gitattributes
+
+# Development files
+.vscode
+.idea
+*.log
+*.md
+.eslintrc*
+.prettierrc*
+.editorconfig
+.husky
+.commitlintrc*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Test files
+coverage
+.nyc_output
+__tests__
+*.test.*
+*.spec.*
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Misc
+.DS_Store
+Thumbs.db
+*.pem

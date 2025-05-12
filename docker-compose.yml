@@ -1,0 +1,27 @@
+services:
+  # Production service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_BASE_URL=${VITE_BASE_URL}
+        - VITE_CHAT_URL=${VITE_CHAT_URL}
+    container_name: pickelball-fe
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    networks:
+      - hoangtu-network
+
+networks:
+  hoangtu-network:
+    driver: bridge
+    external: true
