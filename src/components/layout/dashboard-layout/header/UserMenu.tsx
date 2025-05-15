@@ -37,14 +37,14 @@ const UserMenu = () => {
               className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
               to="/admin/profile"
             >
-              <User className="h-4 w-4" /> Thông tin cá nhân
+              <User className="h-4 w-4" /> Profile
             </Link>
             <Link
               className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-muted"
               to={paths.home}
               onClick={logout}
             >
-              <LogOut className="h-4 w-4" /> Đăng xuất
+              <LogOut className="h-4 w-4" /> Logout
             </Link>
           </div>
         </PopoverContent>

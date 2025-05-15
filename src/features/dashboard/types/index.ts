@@ -1,3 +1,5 @@
+import { OrderStatus } from "@/features/orders/types";
+
 export type PeriodFilter = "today" | "week" | "month" | "year";
 
 export interface DashboardStats {
@@ -55,6 +57,7 @@ export interface RecentOrder {
   totalPrice: number;
   paymentMethod: PaymentMethod;
   paymentStatus: PaymentStatus;
+  orderStatus: OrderStatus;
   createdAt: string;
   updatedAt: string;
   user: User;

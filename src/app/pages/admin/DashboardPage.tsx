@@ -54,7 +54,7 @@ const DashboardPage = () => {
         transition={{ duration: 0.5 }}
       >
         <div className="mb-4 sm:mb-0">
-          <h1 className="text-2xl font-bold md:text-3xl">Bakery Dashboard</h1>
+          <h1 className="text-2xl font-bold md:text-3xl">Dashboard</h1>
         </div>
         <div className="grid grid-flow-col gap-2">
           <PeriodFilter

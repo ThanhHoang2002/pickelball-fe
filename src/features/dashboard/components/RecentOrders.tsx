@@ -2,32 +2,47 @@ import { format } from 'date-fns';
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
 
-import { RecentOrder, PaymentStatus } from '../types';
+import { RecentOrder } from '../types';
 
 import { Card } from '@/components/ui/card';
+import { OrderStatus, PaymentMethod } from '@/features/orders/types';
 import { formatCurrency } from '@/utils/format';
 
 interface RecentOrdersProps {
   orders: RecentOrder[];
 }
 
-const StatusBadgeColors: Record<PaymentStatus, string> = {
+const StatusBadgeColors: Record<OrderStatus, string> = {
   PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300",
-  COMPLETED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+  PROCESSING: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  SHIPPED: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
   CANCELLED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-  FAILED: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300",
-  REFUNDED: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
+  DELIVERED: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300",
 };
 
-const OrderStatusBadge = memo(({ status }: { status: PaymentStatus }) => {
+const OrderStatusBadge = memo(({ status }: { status: OrderStatus }) => {
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${StatusBadgeColors[status]}`}>
       {status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()}
     </span>
   );
 });
-
 OrderStatusBadge.displayName = 'OrderStatusBadge';
+
+const PaymentMethodBadges = memo(({ method }: { method: PaymentMethod }) => {
+  const methodColors: Record<string, string> = {
+    COD: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
+    TRANSFER: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300",
+  };
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${methodColors[method]}`}>
+      {method}
+    </span>
+  );
+}
+)
+PaymentMethodBadges.displayName = 'PaymentMethodBadge';
 
 const formatDate = (dateString: string) => {
   try {
@@ -80,10 +95,10 @@ const RecentOrders = memo(({ orders }: RecentOrdersProps) => {
                     {formatCurrency(order.totalPrice)}
                   </td>
                   <td className="py-4 pr-4">
-                    {order.paymentMethod}
+                    <PaymentMethodBadges method={order.paymentMethod} />
                   </td>
                   <td className="py-4 pr-4">
-                    <OrderStatusBadge status={order.paymentStatus} />
+                    <OrderStatusBadge status={order.orderStatus} />
                   </td>
                 </tr>
               ))}
