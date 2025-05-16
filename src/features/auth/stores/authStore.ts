@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { User } from "@/features/auth/types/auth.type";
+import { queryClient } from "@/lib/query-client";
 
 interface AuthState {
   currentUser?: User;
@@ -15,6 +16,7 @@ export const useAuthStore = create<AuthState>()(
       currentUser: undefined,
       setCurrentUser: (user: User) => set({ currentUser: user }),
       logout: () => {
+        queryClient.clear()
         set({ currentUser: undefined })
         localStorage.removeItem("accessToken")
       },
