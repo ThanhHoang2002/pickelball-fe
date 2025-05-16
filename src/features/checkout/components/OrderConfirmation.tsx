@@ -3,14 +3,16 @@ import { CheckCircle } from 'lucide-react';
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 
+import { useUpdateTransfer } from '../hooks/useUpdateTransfer';
+
 const OrderConfirmation = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const queryClient = useQueryClient();
-
+  const { handleUpdateTransfer } = useUpdateTransfer();
   // Scroll to top on component mount and invalidate cart
   useEffect(() => {
     window.scrollTo(0, 0);
-    
+    handleUpdateTransfer(Number(orderId));
     // Vô hiệu hóa truy vấn giỏ hàng sau khi trang đã được hiển thị
     queryClient.invalidateQueries({ queryKey: ['cart'] });
   }, [queryClient]);

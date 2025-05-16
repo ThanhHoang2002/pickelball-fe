@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
 
-import { getDashboardStats, getTopSellingProducts, getRecentOrders } from "../api";
-import { DashboardStats, PeriodFilter, TopSellingProduct, RecentOrder } from "../types";
+import { getDashboardStats, getTopSellingProducts, getRecentOrders, getSupplierRevenue } from "../api";
+import { DashboardStats, PeriodFilter, TopSellingProduct, RecentOrder, SupplierRevenueData } from "../types";
 
 import { useToast } from "@/hooks/use-toast";
 
@@ -77,6 +77,28 @@ export const useDashboard = (initialPeriod: PeriodFilter = "month") => {
     staleTime: 1000 * 60 * 5, // 5 phút
   });
 
+  // Query cho doanh thu theo nhà cung cấp
+  const {
+    data: supplierRevenue,
+    isLoading: isSupplierRevenueLoading,
+    isError: isSupplierRevenueError,
+  } = useQuery<SupplierRevenueData[]>({
+    queryKey: ["supplierRevenue", period],
+    queryFn: async () => {
+      try {
+        return await getSupplierRevenue(period);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Could not load supplier revenue data. Please try again later.",
+          variant: "destructive",
+        });
+        throw error;
+      }
+    },
+    staleTime: 1000 * 60 * 5, // 5 phút
+  });
+
   // Memoized function để thay đổi khoảng thời gian
   const handlePeriodChange = useCallback((newPeriod: PeriodFilter) => {
     setPeriod(newPeriod);
@@ -108,10 +130,13 @@ export const useDashboard = (initialPeriod: PeriodFilter = "month") => {
     },
     topProducts: topProducts || [],
     recentOrders: recentOrders || [],
+    supplierRevenue: supplierRevenue || [],
     
     // Loading states
-    isLoading: isStatsLoading  || isProductsLoading || isOrdersLoading,
-    isError: isStatsError || isProductsError || isOrdersError,
+    isLoading: isStatsLoading || isProductsLoading || isOrdersLoading || isSupplierRevenueLoading,
+    isSupplierRevenueLoading,
+    isError: isStatsError || isProductsError || isOrdersError || isSupplierRevenueError,
+    isSupplierRevenueError,
     
     // States
     period,

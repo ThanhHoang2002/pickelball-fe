@@ -63,4 +63,10 @@ export interface RecentOrder {
   user: User;
   phone: string;
   address: string;
+}
+
+export interface SupplierRevenueData {
+  name: string;
+  value: number;
+  percentage: number;
 } 

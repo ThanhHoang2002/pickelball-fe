@@ -34,4 +34,19 @@ export interface CustomerFilterParams {
   search?: string;
   role?: string;
   gender?: string;
-} 
+}
+
+/**
+ * Form data for creating or updating a customer
+ */
+export interface CustomerFormData {
+  name: string;
+  email: string;
+  gender: "MALE" | "FEMALE" | "OTHER";
+  roleId: number;
+  address?: string;
+  avatar?: File | null;
+  password?: string;
+}
+
+// Thu00eam CustomerFormData type 

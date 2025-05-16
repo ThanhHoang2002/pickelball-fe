@@ -118,7 +118,7 @@ const AboutPage = () => {
                 Our Story
               </h2>
               <p className="mt-6 text-lg leading-8 text-gray-600">
-                Founded in 2018, HoangTu Sport started with a simple mission: to provide pickleball enthusiasts with premium equipment that enhances their game. What began as a small passion project has grown into one of Vietnam&apos;s most trusted sources for pickleball paddles and accessories.
+                Founded in 2024, HoangTu Sport started with a simple mission: to provide pickleball enthusiasts with premium equipment that enhances their game. What began as a small passion project has grown into one of Vietnam&apos;s most trusted sources for pickleball paddles and accessories.
               </p>
               <p className="mt-4 text-lg leading-8 text-gray-600">
                 Our founder, a former competitive player, noticed a gap in the market for high-quality, performance-focused pickleball equipment. Drawing from years of experience and a deep understanding of the sport, HoangTu Sport was born to fill this need and support the growing pickleball community.

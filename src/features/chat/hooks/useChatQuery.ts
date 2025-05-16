@@ -81,7 +81,6 @@ export const useChatQuery = () => {
           [optimisticUserMessage]
         );
       }
-      
       // Hiển thị typing indicator
       setIsTyping(true);
       
@@ -143,6 +142,7 @@ export const useChatQuery = () => {
         
         // Invalidate để đồng bộ với server data trong lần fetch tiếp theo
         queryClient.invalidateQueries({ queryKey: ['chatHistory', data.thread_id] });
+        queryClient.refetchQueries({ queryKey: ['cart'] });
       }, 800); // Đợi 800ms để hiển thị typing indicator
     },
     onSettled: () => {

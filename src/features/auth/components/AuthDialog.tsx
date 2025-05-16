@@ -108,7 +108,7 @@ export const AuthDialog = ({
       localStorage.setItem('accessToken', response.access_token);
       setIsOpen(false)
       setCurrentUser(response.user)
-      if(response.user.role.name.toLowerCase() === ROLES.ADMIN.toLocaleLowerCase()){
+      if(response.user.role.name.toLowerCase() !== ROLES.USER.toLocaleLowerCase()){
         navigate('/admin')
       }else{
         navigate('/');

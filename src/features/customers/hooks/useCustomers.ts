@@ -1,11 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, useCallback } from "react";
 
-import { getCustomers, getCustomerById } from "../api";
+import { getCustomers, getCustomerById, createCustomer as apiCreateCustomer, updateCustomer as apiUpdateCustomer } from "../api";
 
 import { useToast } from "@/hooks/use-toast";
 import { useDebounceSearch } from "@/hooks/useDebounce";
-import { Customer, CustomerFilterParams } from "@/types/customer";
+import { Customer, CustomerFilterParams, CustomerFormData } from "@/features/customers/types/customer";
 
 export const useCustomers = (initialFilters: CustomerFilterParams = {}) => {
   const [filters, setFilters] = useState<CustomerFilterParams>({
@@ -132,6 +132,47 @@ export const useCustomers = (initialFilters: CustomerFilterParams = {}) => {
     });
   }, [queryClient, toast]);
 
+  // Create a new customer
+  const createCustomer = useCallback(async (customerData: CustomerFormData) => {
+    try {
+      const newCustomer = await apiCreateCustomer(customerData);
+      // Invalidate queries to refresh customer list
+      queryClient.invalidateQueries({
+        queryKey: ["customers"],
+      });
+      return newCustomer;
+    } catch (error: unknown) {
+      toast({
+        title: "Error",
+        description: "Failed to create customer. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  }, [queryClient, toast]);
+
+  // Update an existing customer
+  const updateCustomer = useCallback(async (id: number, customerData: CustomerFormData) => {
+    try {
+      const updatedCustomer = await apiUpdateCustomer(id, customerData);
+      // Invalidate queries to refresh customer list and details
+      queryClient.invalidateQueries({
+        queryKey: ["customers"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["customer", id],
+      });
+      return updatedCustomer;
+    } catch (error: unknown) {
+      toast({
+        title: "Error",
+        description: "Failed to update customer. Please try again.",
+        variant: "destructive",
+      });
+      throw error;
+    }
+  }, [queryClient, toast]);
+
   // Prefetch data khi component mount
   if (data && !isLoading && !isError && data.meta.pages > 1 && (filters.page || 1) < data.meta.pages) {
     prefetchNextPage();
@@ -156,6 +197,8 @@ export const useCustomers = (initialFilters: CustomerFilterParams = {}) => {
     filterByGender,
     resetFilters,
     refreshData: refetch,
-    fetchCustomerById
+    fetchCustomerById,
+    createCustomer,
+    updateCustomer
   };
 }; 

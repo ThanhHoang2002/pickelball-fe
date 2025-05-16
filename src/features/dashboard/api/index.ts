@@ -1,4 +1,4 @@
-import { DashboardStats, PeriodFilter, TopSellingProduct, RecentOrder } from "../types";
+import { DashboardStats, PeriodFilter, TopSellingProduct, RecentOrder, SupplierRevenueData } from "../types";
 
 import axiosClient from "@/lib/axios-client";
 import { ApiResponse } from "@/types/apiResponse";
@@ -30,9 +30,17 @@ export const getRecentOrders = async (limit: number = 5): Promise<RecentOrder[]>
   const response = await axiosClient.get<ApiResponse<DetailResponse<RecentOrder[]>>>("/orders", {
     params: { 
       size: limit,
-      sortBy: "createdAt",
+      sortBy: "id",
       sortDirection: "desc"
      },
   });
   return response.data.data.result;
+};
+
+/**
+ * Lấy doanh thu theo nhà cung cấp
+ */
+export const getSupplierRevenue = async (period: PeriodFilter = "month"): Promise<SupplierRevenueData[]> => {
+  const response = await axiosClient.get<ApiResponse<ApiResponse<{ data: SupplierRevenueData[] }>>>(`/statistics/supplier-revenue/${period}`);
+  return response.data.data.data.data;
 }; 

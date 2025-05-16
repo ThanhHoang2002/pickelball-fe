@@ -118,7 +118,7 @@ const ContactPage = () => {
                   <div>
                     <h3 className="text-base font-semibold text-gray-900">Address</h3>
                     <p className="mt-1 text-gray-600">
-                      No. 15, Lane 76, Alley 51, Linh Quang Street, Van Chuong Ward, Dong Da District, Hanoi
+                      Yen Phong commune, Bac Ninh province
                     </p>
                   </div>
                 </motion.div>
@@ -133,7 +133,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900">Hotline</h3>
-                    <p className="mt-1 text-gray-600">02438222228</p>
+                    <p className="mt-1 text-gray-600">0372507991</p>
                   </div>
                 </motion.div>
                 
@@ -147,7 +147,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900">Email</h3>
-                    <p className="mt-1 text-gray-600">hoangtusport@gmail.com.vn</p>
+                    <p className="mt-1 text-gray-600">letu231103@gmail.com</p>
                   </div>
                 </motion.div>
                 
@@ -161,7 +161,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <h3 className="text-base font-semibold text-gray-900">Working Hours</h3>
-                    <p className="mt-1 text-gray-600">Daily: 7:00 AM - 9:30 PM</p>
+                    <p className="mt-1 text-gray-600">Daily: 7:00 AM - 10:00 PM</p>
                   </div>
                 </motion.div>
               </div>

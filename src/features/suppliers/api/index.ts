@@ -1,6 +1,7 @@
 import { Item, sfAnd, sfLike } from "spring-filter-query-builder";
 
 import axiosClient from "@/lib/axios-client";
+import axiosPublic from "@/lib/axios-public";
 import { ApiResponse } from "@/types/apiResponse";
 import { Supplier, SupplierFilterParams, SupplierResponse } from "@/types/supplier";
 
@@ -16,7 +17,7 @@ export const getAllSuppliers = async (
     ].filter(Boolean) as Item[]
   );
   
-  const response = await axiosClient.get<ApiResponse<SupplierResponse>>("/suppliers", {
+  const response = await axiosPublic.get<ApiResponse<SupplierResponse>>("/suppliers", {
     params: {
       page: params.page || 1,
       size: params.size || 10,

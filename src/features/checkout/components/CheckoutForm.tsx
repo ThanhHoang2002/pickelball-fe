@@ -11,7 +11,7 @@ import { useCheckout } from '../hooks/useCheckout';
 const checkoutSchema = z.object({
   phone: z.string()
     .min(10, 'Phone number must be at least 10 digits')
-    .max(15, 'Phone number must be at most 15 digits')
+    .max(11, 'Phone number must be at most 11 digits')
     .regex(/^[0-9]+$/, 'Phone number must contain only digits'),
   address: z.string()
     .min(5, 'Address is too short')

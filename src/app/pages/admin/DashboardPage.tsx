@@ -6,7 +6,8 @@ import {
   StatCard,
   TopProducts,
   RecentOrders,
-  PeriodFilter
+  PeriodFilter,
+  SalesBySupplier
 } from '@/features/dashboard/components';
 import { useDashboard } from '@/features/dashboard/hooks/useDashboard';
 import { formatCurrency } from '@/utils/format';
@@ -28,9 +29,12 @@ const DashboardPage = () => {
     stats,
     topProducts,
     recentOrders,
+    supplierRevenue,
     period,
     handlePeriodChange,
     isLoading,
+    isSupplierRevenueLoading,
+    isSupplierRevenueError
   } = useDashboard('month');
 
   // Memoize period label để tránh tính toán lại không cần thiết
@@ -101,8 +105,15 @@ const DashboardPage = () => {
       </div>
 
       {/* Charts */}
-      <div className="mt-8">
+      <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
         <TopProducts products={topProducts} />
+        <SalesBySupplier 
+          period={periodLabel} 
+          periodValue={period}
+          supplierRevenue={supplierRevenue}
+          isLoading={isSupplierRevenueLoading}
+          isError={isSupplierRevenueError}
+        />
       </div>
 
       {/* Recent Orders */}
