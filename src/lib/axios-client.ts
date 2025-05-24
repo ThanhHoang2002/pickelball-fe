@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 import { refreshToken } from "@/features/auth/apis/refreshToken";
-import {toast} from "@/hooks/use-toast"
 import { authFormStore } from "@/features/auth/stores/authFormStore";
+import {toast} from "@/hooks/use-toast"
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL as string,
