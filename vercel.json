@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/chatbot/(.*)",
-      "destination": "http://160.191.244.132:8000/api/$1"
+      "source": "/chatbot/(.*)",
+      "destination": "http://160.191.244.132:8000/api/v1"
     },
     {
       "source": "/api/(.*)",
