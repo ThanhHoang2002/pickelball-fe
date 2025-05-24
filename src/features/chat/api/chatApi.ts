@@ -32,6 +32,10 @@ export interface ChatResponse {
   thread_id: string;
 }
 
+export interface SyncDataRequest {
+  type: string
+  limit: number
+}
 /**
  * Gửi tin nhắn chat
  * @param message Nội dung tin nhắn
@@ -77,6 +81,11 @@ export const mapThreadMessageToChatMessage = (messages: ChatThreadMessage[]): Ch
     sender: msg.role === 'user' ? 'user' : 'bot',
     createdAt: msg.created_at,
   }));
+};
+
+export const syncData = async (request: SyncDataRequest) => {
+  const { data } = await axiosChat.post('/auto-sync', request);
+  return data;
 };
 
 /**

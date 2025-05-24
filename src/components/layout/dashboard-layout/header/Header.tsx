@@ -1,8 +1,8 @@
 import { Menu } from 'lucide-react';
 
+import SyncChatData from './SyncChatData';
 import ThemeToggle from './ThemeToggle';
 import UserMenu from './UserMenu';
-
 export interface HeaderProps {
   sidebarOpen: boolean;
   setSidebarOpen: (open: boolean) => void;
@@ -32,9 +32,9 @@ const Header = ({ sidebarOpen, setSidebarOpen }: HeaderProps) => {
           {/* Right: Header items */}
           <div className="flex items-center space-x-3">
             {/* Dark mode toggle */}
-            <div>
-              <ThemeToggle />
-            </div>
+            <ThemeToggle />
+            {/* Sync chat data */}
+            <SyncChatData />
             {/* User dropdown */}
             <UserMenu />
           </div>

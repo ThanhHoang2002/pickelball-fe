@@ -38,7 +38,7 @@ export const useProductsParams = () => {
 
       setSearchParams(updatedParams);
     },
-    [searchParams, setSearchParams]
+    []
   );
   return { filters, updateFilters };
 };

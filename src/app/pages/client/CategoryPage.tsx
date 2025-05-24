@@ -58,7 +58,6 @@ export const CategoryPage = () => {
       if (category !== previousCategory) {
         // Reset search
         setSearchInput('');
-        
         // Reset price inputs
         setMinPriceInput(undefined);
         setMaxPriceInput(undefined);
