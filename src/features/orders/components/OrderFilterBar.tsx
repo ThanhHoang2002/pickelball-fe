@@ -162,7 +162,6 @@ export const OrderFilterBar = ({
                   <SelectItem value="all">All payment methods</SelectItem>
                   <SelectItem value="COD">Cash on Delivery (COD)</SelectItem>
                   <SelectItem value="TRANSFER">Bank Transfer</SelectItem>
-                  <SelectItem value="CREDIT_CARD">Credit Card</SelectItem>
                 </SelectContent>
               </Select>
               {filters.paymentMethod && (

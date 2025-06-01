@@ -1,61 +1,79 @@
 import { motion } from 'motion/react';
-import React from 'react';
-import type { DetailedHTMLProps, HTMLAttributes, OlHTMLAttributes, LiHTMLAttributes, AnchorHTMLAttributes, QuoteHTMLAttributes } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
+import React, { useMemo } from 'react';
 
-import type { ChatMessage as ChatMessageType } from '../../chat/hooks/useChatQuery';
+import type { ChatMessage as ChatMessageType } from '../hooks/useChatQuery';
 
 interface ChatMessageProps {
   message: ChatMessageType;
 }
 
-// Custom components for markdown rendering
-const markdownComponents = {
-  p: (props: DetailedHTMLProps<HTMLAttributes<HTMLParagraphElement>, HTMLParagraphElement>) => (
-    <p className="mb-2" {...props} />
-  ),
-  h1: (props: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
-    <h1 className="mb-2 mt-4 text-2xl font-bold" {...props} />
-  ),
-  h2: (props: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
-    <h2 className="mb-2 mt-4 text-xl font-bold" {...props} />
-  ),
-  h3: (props: DetailedHTMLProps<HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>) => (
-    <h3 className="mb-1 mt-3 text-lg font-bold" {...props} />
-  ),
-  ul: (props: DetailedHTMLProps<HTMLAttributes<HTMLUListElement>, HTMLUListElement>) => (
-    <ul className="mb-3 list-disc pl-5" {...props} />
-  ),
-  ol: (props: DetailedHTMLProps<OlHTMLAttributes<HTMLOListElement>, HTMLOListElement>) => (
-    <ol className="mb-3 list-decimal pl-5" {...props} />
-  ),
-  li: (props: DetailedHTMLProps<LiHTMLAttributes<HTMLLIElement>, HTMLLIElement>) => (
-    <li className="ml-4" {...props} />
-  ),
-  a: (props: DetailedHTMLProps<AnchorHTMLAttributes<HTMLAnchorElement>, HTMLAnchorElement>) => (
-    <a className="text-blue-600 underline hover:text-blue-800" {...props} />
-  ),
-  blockquote: (props: DetailedHTMLProps<QuoteHTMLAttributes<HTMLQuoteElement>, HTMLQuoteElement>) => (
-    <blockquote className="border-l-4 border-gray-300 pl-4 italic" {...props} />
-  ),
-  code: (props: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>) => (
-    <code className="rounded bg-gray-100 px-1 py-0.5 font-mono text-sm" {...props} />
-  ),
-  pre: (props: DetailedHTMLProps<HTMLAttributes<HTMLPreElement>, HTMLPreElement>) => (
-    <pre className="mb-3 overflow-x-auto rounded bg-gray-100 p-3 font-mono text-sm" {...props} />
-  ),
-  hr: () => <hr className="my-3 border-gray-300" />,
-  img: (props: DetailedHTMLProps<HTMLAttributes<HTMLImageElement> & { src?: string, alt?: string }, HTMLImageElement>) => (
-    <div>
-      <strong>Ảnh minh họa: </strong>
-      <img src={props.src} alt={props.alt} className="my-2 max-h-40 rounded-md" />
-    </div>
-  ),
+// Hàm để trích xuất các phần thông tin từ tin nhắn sản phẩm
+const extractProductInfo = (content: string) => {
+  // Kiểm tra xem có phải tin nhắn sản phẩm không
+  if (!content.includes('Dưới đây là') && !content.includes('bán chạy nhất')) {
+    return null;
+  }
+
+  try {
+    // Tách thành từng sản phẩm
+    const productMatches = content.match(/\d+\.\s+.*?(?=\d+\.\s+|$)/gs);
+    
+    if (!productMatches) return null;
+    
+    const products = productMatches.map(productText => {
+      // Lấy tên sản phẩm
+      const nameMatch = productText.match(/\*\*(.*?)\*\*/);
+      const name = nameMatch ? nameMatch[1] : '';
+      
+      // Lấy giá
+      const priceMatch = productText.match(/\*\*Giá:\*\*\s+(.*?)(?=\n|$)/);
+      const price = priceMatch ? priceMatch[1] : '';
+      
+      // Lấy mô tả
+      const descMatch = productText.match(/\*\*Mô tả:\*\*\s+(.*?)(?=\n|$)/);
+      const description = descMatch ? descMatch[1] : '';
+      
+      // Lấy tính năng nổi bật
+      const featuresMatch = productText.match(/\*\*Tính năng nổi bật:\*\*\s+(.*?)(?=\n|$)/);
+      const features = featuresMatch ? featuresMatch[1] : '';
+      
+      // Lấy trạng thái
+      const statusMatch = productText.match(/\*\*Trạng thái:\*\*\s+(.*?)(?=\n|$)/);
+      const status = statusMatch ? statusMatch[1] : '';
+      
+      // Lấy URL hình ảnh
+      const imageMatch = productText.match(/!\[.*?\]\((.*?)\)/);
+      const imageUrl = imageMatch ? imageMatch[1] : '';
+      
+      return {
+        name,
+        price,
+        description,
+        features,
+        status,
+        imageUrl
+      };
+    });
+    
+    return {
+      introText: content.split('\n\n')[0],
+      products,
+      outroText: content.split(/\d+\.\s+.*?(?=\d+\.\s+|$)/gs).pop()?.trim() || ''
+    };
+  } catch (error) {
+    console.error('Error parsing product message:', error);
+    return null;
+  }
 };
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
   const isUser = message.sender === 'user';
+  
+  // Phân tích tin nhắn sản phẩm
+  const productData = useMemo(() => {
+    if (isUser) return null;
+    return extractProductInfo(message.message);
+  }, [isUser, message.message]);
   
   return (
     <div
@@ -73,17 +91,93 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
         className={
           isUser
             ? 'max-w-xs rounded-lg bg-black px-4 py-2 text-white shadow-md'
-            : 'max-w-md rounded-lg bg-gray-200 px-4 py-2 text-gray-900 shadow-md'
+            : 'max-w-md overflow-hidden rounded-lg bg-gray-200 px-4 py-2 text-gray-900 shadow-md'
         }
         tabIndex={0}
         aria-label={isUser ? 'Tin nhắn của bạn' : 'Tin nhắn từ bot'}
       >
         {isUser ? (
           message.message
+        ) : productData ? (
+          <div className="product-message">
+            {/* Intro text */}
+            <p className="mb-3">{productData.introText}</p>
+            
+            {/* Products list */}
+            <div className="space-y-4">
+              {productData.products.map((product, index) => (
+                <div key={index} className="product-item rounded border border-gray-300 bg-white p-3">
+                  <h3 className="mb-2 flex items-center text-lg font-bold">
+                    <span className="mr-2">{index + 1}.</span>
+                    <span className="mr-1">🏓</span>
+                    {product.name}
+                  </h3>
+                  
+                  <div className="ml-6 space-y-1">
+                    {product.price && (
+                      <div className="flex items-start">
+                        <span className="mr-1">💰</span>
+                        <div>
+                          <strong>Giá:</strong> {product.price}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {product.description && (
+                      <div className="flex items-start">
+                        <span className="mr-1">📝</span>
+                        <div>
+                          <strong>Mô tả:</strong> {product.description}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {product.features && (
+                      <div className="flex items-start">
+                        <span className="mr-1">✨</span>
+                        <div>
+                          <strong>Tính năng nổi bật:</strong> {product.features}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {product.status && (
+                      <div className="flex items-start">
+                        <span className="mr-1">ℹ️</span>
+                        <div>
+                          <strong>Trạng thái:</strong> {product.status}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {product.imageUrl && (
+                      <div className="mt-2">
+                        <img 
+                          src={product.imageUrl}
+                          alt={`Hình ảnh ${product.name}`}
+                          className="mt-1 max-h-48 rounded shadow-sm"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Outro text */}
+            {productData.outroText && (
+              <p className="mt-3">{productData.outroText}</p>
+            )}
+          </div>
         ) : (
-          <ReactMarkdown remarkPlugins={[remarkBreaks]} components={markdownComponents}>
-            {message.message}
-          </ReactMarkdown>
+          <div>
+            {message.message.split('\n').map((line, i) => (
+              <p key={i} className={i > 0 ? 'mt-2' : ''}>
+                {line}
+              </p>
+            ))}
+          </div>
         )}
       </motion.div>
     </div>

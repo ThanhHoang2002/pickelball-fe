@@ -38,8 +38,7 @@ const response = await axiosPublic.get<ApiResponse<DetailResponse<Product[]>>>(
         page: params.page,
         size: params.size,
         filter: filter.toString()==="()"?undefined:filter.toString(),
-        sortBy: params.sortBy,
-        sortDirection: params.sortDirection,
+        sort: params.sortBy ? `${params.sortBy},${params.sortDirection?.toUpperCase()}` : undefined,
       },
     }
   );

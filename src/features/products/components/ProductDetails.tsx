@@ -185,9 +185,10 @@ export const ProductDetails = ({ product }: ProductDetailsProps) => {
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Status</span>
-              <span className={`text-sm font-medium ${product?.quantity > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {product?.quantity > 0 ? 'In stock' : 'Out of stock'}
+              <span className={`text-sm font-medium ${product?.status.toLowerCase() === 'active' ? 'text-green-600' : 'text-red-600'}`}>
+                {product?.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}
               </span>
+
             </div>
             <div className="flex justify-between border-b border-gray-100 pb-2">
               <span className="text-sm text-gray-500">Remaining quantity</span>

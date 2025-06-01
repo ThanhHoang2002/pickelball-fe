@@ -1,5 +1,5 @@
 import { Clock, CreditCard, MapPin, Package, Phone, ShoppingBag, User } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Order, OrderStatus, PaymentStatus } from "../types";
 import { OrderStatusBadge } from "./OrderStatusBadge";
@@ -99,19 +99,29 @@ export const OrderDialog = ({
     }).format(date);
   };
 
- 
+  // Update the selected status when the order changes or dialog opens
+  useEffect(() => {
+    if (order) {
+      setNewPaymentStatus(order.paymentStatus);
+      setNewOrderStatus(order.orderStatus);
+    }
+  }, [order, open]);
 
   const handleUpdatePaymentStatus = async () => {
     if (onUpdatePaymentStatus && newPaymentStatus && order) {
-      await onUpdatePaymentStatus(order.id, newPaymentStatus as PaymentStatus);
-      setNewPaymentStatus("");
+      // Only update if the status has changed
+      if (newPaymentStatus !== order.paymentStatus) {
+        await onUpdatePaymentStatus(order.id, newPaymentStatus as PaymentStatus);
+      }
     }
   };
 
   const handleUpdateOrderStatus = async () => {
     if (onUpdateOrderStatus && newOrderStatus && order) {
-      await onUpdateOrderStatus(order.id, newOrderStatus as OrderStatus);
-      setNewOrderStatus("");
+      // Only update if the status has changed
+      if (newOrderStatus !== order.orderStatus) {
+        await onUpdateOrderStatus(order.id, newOrderStatus as OrderStatus);
+      }
     }
   };
 
@@ -257,7 +267,7 @@ export const OrderDialog = ({
                           </SelectContent>
                         </Select>
                         <Button 
-                          disabled={!newPaymentStatus || loading} 
+                          disabled={!newPaymentStatus || loading || newPaymentStatus === order.paymentStatus} 
                           onClick={handleUpdatePaymentStatus}
                           size="sm"
                         >
@@ -285,7 +295,7 @@ export const OrderDialog = ({
                           </SelectContent>
                         </Select>
                         <Button 
-                          disabled={!newOrderStatus || loading} 
+                          disabled={!newOrderStatus || loading || newOrderStatus === order.orderStatus} 
                           onClick={handleUpdateOrderStatus}
                           size="sm"
                         >

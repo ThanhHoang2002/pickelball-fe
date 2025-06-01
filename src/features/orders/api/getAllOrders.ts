@@ -8,12 +8,14 @@ import { ApiResponse } from "@/types/apiResponse";
 export const getAllOrders = async (
   params: OrderFilterParams
 ): Promise<OrderResponse> => {
+  console.log(params)
   // Xây dựng bộ lọc từ các tham số
   const filter = sfAnd(
     [
       params.search && sfLike("user.name", params.search),
       params.paymentStatus && sfEqual("paymentStatus", params.paymentStatus),
       params.paymentMethod && sfEqual("paymentMethod", params.paymentMethod),
+      params.orderStatus && sfEqual("orderStatus", params.orderStatus),
       params.fromDate && sfGe("createdAt", params.fromDate),
       params.toDate && sfLe("createdAt", params.toDate),
       params.userId && sfEqual("user.id", params.userId),
@@ -27,8 +29,7 @@ export const getAllOrders = async (
         page: params.page != null ? params.page : 0,
         size: params.size || 10,
         filter: filter.toString() === "()" ? undefined : filter.toString(),
-        sortBy: params.sortBy || "createdAt",
-        sortDirection: params.sortDirection || "desc",
+        sort: params.sortBy ? `${params.sortBy},${params.sortDirection?.toUpperCase()}` : undefined,
       },
     }
   );
