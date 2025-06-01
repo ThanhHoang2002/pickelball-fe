@@ -30,7 +30,6 @@ export const useDashboard = (initialPeriod: PeriodFilter = "month") => {
         throw error;
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 phút
   })
 
   // Query cho sản phẩm bán chạy
@@ -52,7 +51,6 @@ export const useDashboard = (initialPeriod: PeriodFilter = "month") => {
         throw error;
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 phút
   });
 
   // Query cho đơn hàng gần đây
@@ -74,7 +72,6 @@ export const useDashboard = (initialPeriod: PeriodFilter = "month") => {
         throw error;
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 phút
   });
 
   // Query cho doanh thu theo nhà cung cấp
@@ -96,7 +93,6 @@ export const useDashboard = (initialPeriod: PeriodFilter = "month") => {
         throw error;
       }
     },
-    staleTime: 1000 * 60 * 5, // 5 phút
   });
 
   // Memoized function để thay đổi khoảng thời gian

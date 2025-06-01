@@ -34,9 +34,6 @@ export const Navbar = () => {
   return (
     <nav className="sticky top-0 z-50 w-full bg-white shadow">
       {/* Free shipping announcement */}
-      <div className="bg-black py-2 text-center text-sm text-white">
-        Free shipping on all orders $150+
-      </div>
       
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">

@@ -25,6 +25,9 @@ const CustomerPage = () => {
   const [dialogMode, setDialogMode] = useState<CustomerDialogMode>(CustomerDialogMode.VIEW);
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
   
+  // Role filter state
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  
   // Loading state for api calls
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   
@@ -42,8 +45,15 @@ const CustomerPage = () => {
     fetchCustomerById,
     createCustomer,
     updateCustomer,
-    refreshData
+    refreshData,
+    filterByRole
   } = useCustomers();
+
+  // Handle role filter change
+  const handleRoleFilterChange = useCallback((role: string | null) => {
+    setSelectedRole(role);
+    filterByRole(role || undefined);
+  }, [filterByRole]);
 
   // Open dialog for viewing customer details
   const handleViewCustomer = useCallback(async (customer: Customer) => {
@@ -145,6 +155,8 @@ const CustomerPage = () => {
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm} 
         onCreateCustomer={handleCreateCustomer}
+        selectedRole={selectedRole}
+        setSelectedRole={handleRoleFilterChange}
       />
       
       {/* Customer data table */}
