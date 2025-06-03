@@ -1,15 +1,21 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { updateTransfer } from "../api/updateTransfer";
+import { updateTransfer, UpdateTransferParams } from "../api/updateTransfer";
 
 export const useUpdateTransfer = () => {
-
     const updateTransferMutation = useMutation({
         mutationFn: updateTransfer
     });
-    const handleUpdateTransfer = (orderId: number) => {
-        updateTransferMutation.mutate(orderId);
+    
+    const handleUpdateTransfer = (params: UpdateTransferParams) => {
+        return updateTransferMutation.mutateAsync(params);
     }
-    return { handleUpdateTransfer };
+    
+    return { 
+        handleUpdateTransfer,
+        isLoading: updateTransferMutation.isPending,
+        data: updateTransferMutation.data,
+        error: updateTransferMutation.error
+    };
 }
 

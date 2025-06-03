@@ -1,7 +1,21 @@
 import axiosClient from "@/lib/axios-client";
 
-export const updateTransfer = async (orderId: number) => {
-    const response = await axiosClient.put(`/orders/${orderId}/update-transfer`);
-    return response.data;
+export interface UpdateTransferParams {
+  vnp_Amount: string;
+  vnp_BankCode: string;
+  vnp_CardType: string;
+  vnp_OrderInfo: string;
+  vnp_PayDate: string;
+  vnp_ResponseCode: string;
+  vnp_TmnCode: string;
+  vnp_TransactionNo: string;
+  vnp_TransactionStatus: string;
+  vnp_TxnRef: string;
+  vnp_SecureHash: string;
+}
+
+export const updateTransfer = async (params: UpdateTransferParams) => {
+  const response = await axiosClient.get(`/vnpay/process-payment`, { params });
+  return response.data;
 };
 
