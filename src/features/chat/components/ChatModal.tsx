@@ -5,6 +5,8 @@ import { ChatMessage } from './ChatMessage';
 import { ChatTypingIndicator } from './ChatTypingIndicator';
 import { ChatMessage as ChatMessageType } from '../hooks/useChatQuery';
 
+import { Button } from '@/components/ui/button';
+
 type ChatModalProps = {
   isOpen: boolean;
   messages: ChatMessageType[];
@@ -73,14 +75,13 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                   onClick={handleNewChat}
                   aria-label="Tạo đoạn chat mới"
                   tabIndex={0}
-                  className="flex items-center gap-1 rounded-full bg-white/20 px-2 py-1 text-sm backdrop-blur-sm hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                  className="flex items-center gap-1 rounded-full bg-white/20 p-2 text-sm backdrop-blur-sm hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  <span>Chat mới</span>
+                  </svg>      
                 </motion.button>
                 <button
                   onClick={onClose}
@@ -102,8 +103,7 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.77 9.77 0 01-4-.8L3 21l1.8-4A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
-                  <p className="text-sm font-medium text-gray-600">Chào mừng bạn đến với Hoang Tu Sport Chatbot!</p>
-                  <p className="mt-1 text-xs text-gray-500">Hãy đặt câu hỏi để được tư vấn.</p>
+                  <p className="text-sm font-medium text-gray-600">Welcome to Hoang Tu Sport Chatbot!</p>
                 </div>
               )}
               {messages.map((msg) => (
@@ -123,19 +123,14 @@ export const ChatModal: React.FC<ChatModalProps> = ({
                 aria-label="Nhập tin nhắn"
                 disabled={loading}
               />
-              <motion.button
+              <Button
                 onClick={onSendMessage}
                 disabled={loading || !inputValue.trim()}
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 disabled:opacity-50"
                 aria-label="Gửi tin nhắn"
-                tabIndex={0}
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                whileTap={{ scale: 0.95 }}
+                className="rounded-lg bg-black px-4 py-2 text-white shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 disabled:opacity-50"
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-                </svg>
-              </motion.button>
+                Send
+              </Button>
             </div>
           </motion.div>
         </motion.div>

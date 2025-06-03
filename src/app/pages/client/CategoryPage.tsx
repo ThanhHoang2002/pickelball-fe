@@ -348,8 +348,23 @@ export const CategoryPage = () => {
                       type="number"
                       id="price-min"
                       placeholder="Min"
+                      min="0"
                       value={minPriceSearch.searchTerm}
-                      onChange={(e) => minPriceSearch.setSearchTerm(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value ? Number(value) : undefined;
+                        
+                        // Validate: giá trị không âm
+                        if (numValue !== undefined && numValue < 0) return;
+                        
+                        // Validate: minPrice không được lớn hơn maxPrice nếu maxPrice đã được nhập
+                        if (maxPriceSearch.searchTerm && numValue !== undefined && numValue > Number(maxPriceSearch.searchTerm)) {
+                          alert("Minimum price cannot be greater than maximum price");
+                          return;
+                        }
+                        
+                        minPriceSearch.setSearchTerm(value);
+                      }}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     />
                   </div>
@@ -361,12 +376,28 @@ export const CategoryPage = () => {
                       type="number"
                       id="price-max"
                       placeholder="Max"
+                      min="0"
                       value={maxPriceSearch.searchTerm}
-                      onChange={(e) => maxPriceSearch.setSearchTerm(e.target.value)}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numValue = value ? Number(value) : undefined;
+                        
+                        // Validate: giá trị không âm
+                        if (numValue !== undefined && numValue < 0) return;
+                                                
+                        maxPriceSearch.setSearchTerm(value);
+                      }}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     />
                   </div>
                 </div>
+                {/* Error message for price validation */}
+                {minPriceSearch.searchTerm && maxPriceSearch.searchTerm && 
+                  Number(minPriceSearch.searchTerm) > Number(maxPriceSearch.searchTerm) && (
+                  <p className="mt-1 text-xs text-red-500">
+                    Minimum price cannot be greater than maximum price
+                  </p>
+                )}
                 {/* Reset button for price filter */}
                 {(minPrice !== undefined || maxPrice !== undefined) && (
                   <button
