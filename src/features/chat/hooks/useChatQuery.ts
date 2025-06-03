@@ -81,6 +81,7 @@ export const useChatQuery = () => {
           [optimisticUserMessage]
         );
       }
+      
       // Hiển thị typing indicator
       setIsTyping(true);
       
@@ -142,7 +143,8 @@ export const useChatQuery = () => {
         
         // Invalidate để đồng bộ với server data trong lần fetch tiếp theo
         queryClient.invalidateQueries({ queryKey: ['chatHistory', data.thread_id] });
-        queryClient.refetchQueries({ queryKey: ['cart'] });
+
+        queryClient.invalidateQueries({ queryKey: ['cart'] });
       }, 800); // Đợi 800ms để hiển thị typing indicator
     },
     onSettled: () => {
@@ -178,6 +180,26 @@ export const useChatQuery = () => {
   const handleOpen = useCallback(() => setIsOpen(true), []);
   const handleClose = useCallback(() => setIsOpen(false), []);
 
+  // Hàm reset chat để tạo đoạn chat mới
+  const resetChat = useCallback(() => {
+    // Xóa threadId trong state
+    setThreadId(null);
+    
+    // Xóa threadId trong localStorage
+    localStorage.removeItem(THREAD_ID_KEY);
+    
+    // Xóa cache của query hiện tại nếu có
+    if (threadId) {
+      queryClient.removeQueries({ queryKey: ['chatHistory', threadId] });
+    }
+    
+    // Reset input value
+    setInputValue('');
+    
+    // Tắt typing indicator nếu đang hiển thị
+    setIsTyping(false);
+  }, [threadId, queryClient]);
+
   return {
     // Data
     threadId,
@@ -198,5 +220,6 @@ export const useChatQuery = () => {
     handleInputChange,
     handleSendMessage,
     handleKeyDown,
+    resetChat,
   };
 }; 

@@ -1,22 +1,23 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 export const ChatTypingIndicator: React.FC = () => {
   return (
-    <div className="mb-2 flex justify-start">
-      <div className="flex max-w-xs items-end space-x-1 rounded-lg bg-gray-200 px-4 py-2 text-gray-900 shadow-md">
+    <div className="mb-3 flex justify-start">
+      <div className="flex max-w-xs items-end space-x-1.5 rounded-t-2xl rounded-br-2xl bg-white px-4 py-3 shadow-md">
         {[0, 1, 2].map((dot) => (
           <motion.div
             key={dot}
-            className="h-2 w-2 rounded-full bg-gray-500"
-            initial={{ y: 0 }}
+            className="h-2.5 w-2.5 rounded-full bg-black"
+            initial={{ y: 0, opacity: 0.5 }}
             animate={{ 
-              y: [0, -5, 0]
+              y: [0, -6, 0],
+              opacity: [0.5, 1, 0.5]
             }}
             transition={{
-              duration: 1,
+              duration: 0.8,
               repeat: Infinity,
-              delay: dot * 0.2,
+              delay: dot * 0.15,
               ease: "easeInOut"
             }}
           />

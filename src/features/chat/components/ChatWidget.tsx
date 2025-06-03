@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 import React, { useRef, useEffect, useState } from 'react';
 
 import { ChatModal } from './ChatModal';
@@ -15,6 +15,7 @@ export const ChatWidget: React.FC = () => {
     handleClose,
     handleInputChange,
     handleSendMessage,
+    resetChat,
   } = useChatQuery();
 
   // Ref để scroll xuống cuối danh sách tin nhắn
@@ -59,16 +60,26 @@ export const ChatWidget: React.FC = () => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 50);
   };
+
+  // Hàm xử lý tạo chat mới
+  const handleNewChat = () => {
+    // Reset chat state
+    resetChat();
+    
+    // Reset counter
+    setPrevMessageCount(0);
+  };
   
   return (
     <>
       <motion.button
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ scale: 1.1 }}
-        transition={{ duration: 0.3, type: 'spring' }}
-        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg focus:outline-none focus:ring-2 focus:ring-black"
-        aria-label="Mở chat hỗ trợ"
+        whileHover={{ scale: 1.05, boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.3)" }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ duration: 0.3, type: 'spring', bounce: 0.4 }}
+        className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-black shadow-lg focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
+        aria-label="Mở Hoang Tu Sport Chatbot"
         tabIndex={0}
         onClick={handleOpen}
         onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => { if (e.key === 'Enter' || e.key === ' ') handleOpen(); }}
@@ -88,6 +99,7 @@ export const ChatWidget: React.FC = () => {
         onInputChange={handleInputChange}
         onSendMessage={handleSendMessageWithUIUpdate}
         onKeyDown={(e) => { if (e.key === 'Enter') handleSendMessageWithUIUpdate(); }}
+        onNewChat={handleNewChat}
       />
     </>
   );

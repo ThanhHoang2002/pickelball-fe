@@ -13,6 +13,10 @@ export interface ChatThreadMessage {
     agent?: string;
   };
 }
+export interface SyncDataRequest {
+  type: string
+  limit: number
+}
 
 export interface SendChatRequest {
   message: string;
@@ -32,10 +36,6 @@ export interface ChatResponse {
   thread_id: string;
 }
 
-export interface SyncDataRequest {
-  type: string
-  limit: number
-}
 /**
  * Gửi tin nhắn chat
  * @param message Nội dung tin nhắn

@@ -63,4 +63,4 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
       </motion.div>
     </div>
   );
-};
+}; 
