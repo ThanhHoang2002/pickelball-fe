@@ -35,6 +35,7 @@ const OrderConfirmation = () => {
   const vnp_TransactionStatus = searchParams.get('vnp_TransactionStatus');
   const vnp_TxnRef = searchParams.get('vnp_TxnRef');
   const vnp_SecureHash = searchParams.get('vnp_SecureHash');
+  const vnp_BankTranNo = searchParams.get('vnp_BankTranNo');
   const queryClient = useQueryClient();
   const { handleUpdateTransfer } = useUpdateTransfer();
   const [paymentResult, setPaymentResult] = useState<PaymentResponse | null>(null);
@@ -57,6 +58,7 @@ const OrderConfirmation = () => {
             vnp_CardType: vnp_CardType || '',
             vnp_OrderInfo: vnp_OrderInfo || '',
             vnp_PayDate: vnp_PayDate || '',
+            vnp_BankTranNo: vnp_BankTranNo || '',
             vnp_ResponseCode: vnp_ResponseCode || '',
             vnp_TmnCode: vnp_TmnCode || '',
             vnp_TransactionNo: vnp_TransactionNo || '',

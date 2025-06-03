@@ -5,6 +5,7 @@ export interface UpdateTransferParams {
   vnp_BankCode: string;
   vnp_CardType: string;
   vnp_OrderInfo: string;
+  vnp_BankTranNo: string;
   vnp_PayDate: string;
   vnp_ResponseCode: string;
   vnp_TmnCode: string;
