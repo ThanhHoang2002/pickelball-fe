@@ -16,7 +16,7 @@ import { ProductGrid } from '@/features/products/components/ProductGrid';
 import { useProductsParams } from '@/features/products/hooks/useProductParams';
 import { useProductsByCategory } from '@/features/products/hooks/useProducts';
 import { useSuppliers } from '@/features/suppliers/hooks/useSuppliers';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useDebounceSearch } from '@/hooks/useDebounce';
 import { mappingCategoryName } from '@/utils/mappingCategoryName';
 
 // Mapping giữa ID danh mục và mô tả
@@ -31,6 +31,7 @@ export const CategoryPage = () => {
   const { filters, updateFilters } = useProductsParams();
   const { suppliers: suppliersData } = useSuppliers();
   const {addItem} = useCart()
+  
   // Lấy các tham số lọc từ URL
   const minPrice = filters.minPrice;
   const maxPrice = filters.maxPrice;
@@ -38,18 +39,21 @@ export const CategoryPage = () => {
   const sortDirection = filters.sortDirection;
   const searchTerm = filters.search;
   
-  // State để lưu trữ giá trị đang nhập trước khi debounce
-  const [minPriceInput, setMinPriceInput] = useState<number | undefined>(minPrice);
-  const [maxPriceInput, setMaxPriceInput] = useState<number | undefined>(maxPrice);
-  const [searchInput, setSearchInput] = useState<string>(searchTerm || '');
-  
-  // Sử dụng debounce cho giá trị giá và search
-  const debouncedMinPrice = useDebounce<number | undefined>(minPriceInput, { delay: 500 });
-  const debouncedMaxPrice = useDebounce<number | undefined>(maxPriceInput, { delay: 500 });
-  const debouncedSearchTerm = useDebounce<string>(searchInput, { delay: 500 });
-  
   // Lưu trữ category hiện tại để theo dõi thay đổi
   const [previousCategory, setPreviousCategory] = useState<string | undefined>(category);
+  
+  // Sử dụng debounce cho giá trị giá và search
+  const minPriceSearch = useDebounceSearch((value: string) => {
+    updateFilters({ minPrice: value ? Number(value) : undefined, page: 1 });
+  }, { delay: 500 });
+  
+  const maxPriceSearch = useDebounceSearch((value: string) => {
+    updateFilters({ maxPrice: value ? Number(value) : undefined, page: 1 });
+  }, { delay: 500 });
+  
+  const searchTermDebounce = useDebounceSearch((value: string) => {
+    updateFilters({ search: value || undefined, page: 1 });
+  }, { delay: 500 });
   
   // Cập nhật category filter từ URL parameter
   useEffect(() => {
@@ -57,10 +61,10 @@ export const CategoryPage = () => {
       // Nếu category thay đổi, reset search và các bộ lọc khác
       if (category !== previousCategory) {
         // Reset search
-        setSearchInput('');
+        searchTermDebounce.setSearchTerm('');
         // Reset price inputs
-        setMinPriceInput(undefined);
-        setMaxPriceInput(undefined);
+        minPriceSearch.setSearchTerm('');
+        maxPriceSearch.setSearchTerm('');
         
         // Cập nhật filters với category mới và reset các bộ lọc
         updateFilters({
@@ -85,7 +89,7 @@ export const CategoryPage = () => {
         });
       }
     }
-  }, [category, previousCategory, updateFilters]);
+  }, [category]);
   
   // Fetch sản phẩm theo danh mục
   const { data: productData, isLoading, isFetching } = useProductsByCategory(
@@ -105,29 +109,9 @@ export const CategoryPage = () => {
     return category;
   };
   
-  // Cập nhật URL khi giá trị debounced thay đổi
-  useEffect(() => {
-    if (debouncedMinPrice !== minPrice) {
-      updateFilters({ minPrice: debouncedMinPrice, page: 1 });
-    }
-  }, [debouncedMinPrice, minPrice, updateFilters]);
-  
-  useEffect(() => {
-    if (debouncedMaxPrice !== maxPrice) {
-      updateFilters({ maxPrice: debouncedMaxPrice, page: 1 });
-    }
-  }, [debouncedMaxPrice, maxPrice, updateFilters]);
-  
-  // Cập nhật URL khi search term thay đổi
-  useEffect(() => {
-    if (debouncedSearchTerm !== searchTerm) {
-      updateFilters({ search: debouncedSearchTerm, page: 1 });
-    }
-  }, [debouncedSearchTerm, searchTerm, updateFilters]);
-  
   // Xử lý xóa search
   const handleClearSearch = () => {
-    setSearchInput('');
+    searchTermDebounce.setSearchTerm('');
     updateFilters({ search: undefined, page: 1 });
   };
   
@@ -163,6 +147,19 @@ export const CategoryPage = () => {
       page: 1
     });
   };
+
+  // Initialize search and price inputs with current filter values
+  useEffect(() => {
+    if (searchTerm) {
+      searchTermDebounce.setSearchTerm(searchTerm);
+    }
+    if (minPrice !== undefined) {
+      minPriceSearch.setSearchTerm(String(minPrice));
+    }
+    if (maxPrice !== undefined) {
+      maxPriceSearch.setSearchTerm(String(maxPrice));
+    }
+  }, []);
 
   // Tạo các nút phân trang
   const renderPaginationItems = () => {
@@ -292,10 +289,10 @@ export const CategoryPage = () => {
             type="text"
             className="w-full rounded-md border border-gray-300 py-3 pl-10 pr-12 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
             placeholder="Search products..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
+            value={searchTermDebounce.searchTerm}
+            onChange={(e) => searchTermDebounce.setSearchTerm(e.target.value)}
           />
-          {searchInput && (
+          {searchTermDebounce.searchTerm && (
             <button
               className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600"
               onClick={handleClearSearch}
@@ -351,11 +348,8 @@ export const CategoryPage = () => {
                       type="number"
                       id="price-min"
                       placeholder="Min"
-                      value={minPriceInput ?? ''}
-                      onChange={(e) => {
-                        const value = e.target.value === '' ? undefined : Number(e.target.value);
-                        setMinPriceInput(value);
-                      }}
+                      value={minPriceSearch.searchTerm}
+                      onChange={(e) => minPriceSearch.setSearchTerm(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     />
                   </div>
@@ -367,11 +361,8 @@ export const CategoryPage = () => {
                       type="number"
                       id="price-max"
                       placeholder="Max"
-                      value={maxPriceInput ?? ''}
-                      onChange={(e) => {
-                        const value = e.target.value === '' ? undefined : Number(e.target.value);
-                        setMaxPriceInput(value);
-                      }}
+                      value={maxPriceSearch.searchTerm}
+                      onChange={(e) => maxPriceSearch.setSearchTerm(e.target.value)}
                       className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
                     />
                   </div>
@@ -380,8 +371,8 @@ export const CategoryPage = () => {
                 {(minPrice !== undefined || maxPrice !== undefined) && (
                   <button
                     onClick={() => {
-                      setMinPriceInput(undefined);
-                      setMaxPriceInput(undefined);
+                      minPriceSearch.setSearchTerm('');
+                      maxPriceSearch.setSearchTerm('');
                       updateFilters({ minPrice: undefined, maxPrice: undefined, page: 1 });
                     }}
                     className="mt-2 text-xs text-gray-600 hover:text-black"

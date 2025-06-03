@@ -27,7 +27,7 @@ export const useProductsParams = () => {
       // Cập nhật chỉ các params mới
       Object.entries(newFilters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          if (key === "search") {
+          if (key === "search" || key === "minPrice" || key === "maxPrice") {
             updatedParams.set("page", "1");
           }
           updatedParams.set(key, value.toString().trim());

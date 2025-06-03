@@ -7,7 +7,7 @@ const SyncChatData = () => {
     const { syncDataMutation, isSyncing } = useChatSync();
 
     const handleSyncData = () => {
-        syncDataMutation({ type: "all", limit: 100 });
+        syncDataMutation({ type: "products", limit: 1000 });
     };
 
     return (
